@@ -7,11 +7,111 @@ body {
   min-height: 100vh;
   font-family: "Martian Mono", monospace;
 }
-
+a {
+  color: #ece0e0;
+}
+a:visited {
+  color: #ece0e0;
+}
 #app {
   height: 100vh;
 }
 
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .material-symbols-rounded {
   font-variation-settings: "FILL" 1, "wght" 600, "GRAD" 0, "opsz" 48;
+}
+
+.unselectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#seek {
+  margin: auto;
+  appearance: none;
+  -webkit-appearance: none;
+  overflow: hidden;
+  height: 0.25rem;
+  width: 100%;
+  cursor: pointer;
+  border-radius: 2rem; /* iOS */
+  z-index: 20;
+}
+
+#seek::-webkit-slider-runnable-track {
+  background: #ddd;
+}
+
+/*
+ * 1. Set to 0 width and remove border for a slider without a thumb
+ * 2. Shadow is negative the full width of the input and has a spread 
+ *    of the width of the input.
+ */
+#seek::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 0.5rem; /* 1 */
+  height: 0.5rem;
+  background: crimson;
+  box-shadow: -100vh 0 0 100vh crimson;
+}
+
+#seek::-moz-range-track {
+  height: 0.25rem;
+  background: #ddd;
+}
+
+#seek::-moz-range-thumb {
+  background: crimson;
+  height: 0.5rem;
+  width: 0.5rem;
+  border-radius: 0 !important;
+  box-shadow: -100vh 0 0 100vh crimson;
+  box-sizing: border-;
+}
+
+#seek::-ms-fill-lower {
+  background: crimson;
+}
+
+#seek::-ms-thumb {
+  background: #fff;
+  border: 2px solid #999;
+  height: 0.5rem;
+  width: 0.5rem;
+  box-sizing: border-box;
+}
+
+#seek::-ms-ticks-after {
+  display: none;
+}
+
+#seek::-ms-ticks-before {
+  display: none;
+}
+
+#seek::-ms-track {
+  background: #ddd;
+  color: transparent;
+  height: 0.25rem;
+  border: none;
+}
+
+#seek::-ms-tooltip {
+  display: none;
 }
