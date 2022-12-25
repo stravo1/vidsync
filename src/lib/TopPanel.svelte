@@ -1,8 +1,8 @@
 <header class="background on-background-text">
   <h1>vidsync</h1>
   <section>
-    <span class="material-symbols-rounded"> light_mode </span>
     <a href="https://github.com/stravo1/react-yt-player" title="code"><span class="material-symbols-rounded"> code </span></a>
+    <span class="material-symbols-rounded"> help </span>
   </section>
 </header>
 

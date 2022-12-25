@@ -1,4 +1,5 @@
 <script>
+  import { default as toWebVTT } from "srt-webvtt";
   import { onMount } from "svelte";
   import { getTime } from "../../assets/js/misc";
   export let src = "";
@@ -6,6 +7,8 @@
 
   let player;
   let wrapper;
+  let subsFile;
+  let subs;
   let time = 0;
   let max = 0;
   let timer = null;
@@ -26,8 +29,26 @@
     max = player.duration;
   }
 
+  $: if (subsFile != undefined) {
+    setSubs();
+  }
+  const setSubs = async () => {
+    let url;
+    if (subsFile[0].type == "text/vtt") {
+      url = URL.createObjectURL(subsFile[0]);
+    } else if (subsFile[0].type == "application/x-subrip") {
+      url = await toWebVTT(subsFile[0]);
+    } else {
+      alert("Unsupported file type :(");
+      return;
+    }
+    subs.src = url;
+    player.textTracks[1].mode = "showing";
+    console.log(subsFile[0].type);
+  };
   const setPlayer = (e) => {
     player = document.getElementById("video");
+    subs = document.getElementById("subs");
     wrapper = document.getElementById("player");
 
     player.addEventListener("loadedmetadata", () => {
@@ -82,6 +103,9 @@
     }
     muted = !muted;
   };
+  const handleSubs = () => {
+    document.getElementById("subsFile").click();
+  };
   const handleFullScreen = () => {
     handleOpacity();
     var requestFullScreen =
@@ -131,6 +155,13 @@
   };
 </script>
 
+<input
+  id="subsFile"
+  type="file"
+  accept=".srt,.vtt"
+  style="display: none"
+  bind:files={subsFile}
+/>
 <div
   class="player center"
   id="player"
@@ -182,13 +213,20 @@
             {/if}
           </span>
         </div>
-        <div
-          on:click|stopPropagation={handleFullScreen}
-          on:keypress={handleFullScreen}
-        >
-          <span class="lower-button unselectable material-symbols-rounded"
-            >fullscreen</span
+        <div style="display: flex; gap: 1rem">
+          <div on:click|stopPropagation={handleSubs} on:keypress={handleSubs}>
+            <span class="lower-button unselectable material-symbols-rounded"
+              >closed_caption</span
+            >
+          </div>
+          <div
+            on:click|stopPropagation={handleFullScreen}
+            on:keypress={handleFullScreen}
           >
+            <span class="lower-button unselectable material-symbols-rounded"
+              >fullscreen</span
+            >
+          </div>
         </div>
       </div>
       <div class="seek">
@@ -211,6 +249,7 @@
   </div>
   <video {src} type="video/mp4" id="video">
     <track kind="captions" />
+    <track kind="subtitles" id="subs" />
   </video>
 </div>
 
@@ -278,7 +317,7 @@
     box-sizing: border-box;
   }
   .lower-button {
-    font-size: 18px;
+    font-size: 20px;
     opacity: 0.65;
     cursor: pointer;
     transition: all;
@@ -307,5 +346,14 @@
     width: 100%;
     height: 100%;
     border-radius: 1rem;
+  }
+  video::cue {
+    background-color: #00000051;
+  }
+  video::-webkit-media-text-track-container {
+    overflow: visible !important;
+    -webkit-transform: translateY(-5%) !important;
+    transform: translateY(-5%) !important;
+    position: relative;
   }
 </style>
