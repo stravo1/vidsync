@@ -1,12 +1,11 @@
 <script>
-  import { getTime } from "../assets/js/misc";
+  import { onMount } from "svelte";
+  import { getTime } from "../../assets/js/misc";
+  export let src = "";
+  export let name = "";
 
-  let files;
-  let selected;
-  let src;
   let player;
   let wrapper;
-  let name = "";
   let time = 0;
   let max = 0;
   let timer = null;
@@ -17,26 +16,15 @@
   let visible = true;
   let touch = false;
 
-  $: {
-    if (files == undefined) {
-      selected = false;
-    } else if (files.length) {
-      selected = true;
-      src = URL.createObjectURL(files[0]);
-      name = files[0].name;
-      setTimeout(setPlayer, 100);
-    }
-  }
+  onMount(() => {
+    setTimeout(setPlayer, 100);
+  });
 
   $: if (player == undefined) {
     max = 0;
   } else {
     max = player.duration;
   }
-
-  const clickOpen = () => {
-    document.getElementById("fileSelector").click();
-  };
 
   const setPlayer = (e) => {
     player = document.getElementById("video");
@@ -50,7 +38,6 @@
       ended = player.ended;
     }, 1000);
   };
-
   const handlePlay = () => {
     handleOpacity();
     if (ended) {
@@ -144,123 +131,90 @@
   };
 </script>
 
-<div class="wrapper">
-  {#if !selected}
-    <div
-      class="selector on-background-text"
-      on:click={clickOpen}
-      on:keypress={clickOpen}
-    >
-      <div>
-        <input type="file" accept="video/*" bind:files id="fileSelector" />
-        <span class="material-symbols-rounded"> add </span>
-        <br />
-        select a video file
+<div
+  class="player center"
+  id="player"
+  on:mouseenter={handleOpacity}
+  on:mouseleave={handleOpacity}
+  on:mousemove={handleOpacity}
+  on:click={handleOpacity}
+  on:keydown={handleOpacity}
+  on:touchend={handleOpacity}
+>
+  <div class="controls" style={visible ? "opacity: 0.9" : "opacity: 0"}>
+    <div class="title">
+      <div class="ellipsis unselectable">{name}</div>
+    </div>
+    <div class="buttons">
+      <div
+        on:click|stopPropagation={handleBackward}
+        on:keypress={handleBackward}
+      >
+        <span class="button unselectable material-symbols-rounded"
+          >fast_rewind</span
+        >
+      </div>
+      <div on:click|stopPropagation={handlePlay} on:keypress={handlePlay}>
+        <span class="button unselectable material-symbols-rounded">
+          {#if paused}
+            play_arrow
+          {:else if ended}
+            restart_alt
+          {:else}
+            pause
+          {/if}
+        </span>
+      </div>
+      <div on:click|stopPropagation={handleForward} on:keypress={handleForward}>
+        <span class="button unselectable material-symbols-rounded"
+          >fast_forward</span
+        >
       </div>
     </div>
-  {:else}
-    <div
-      class="player center"
-      id="player"
-      on:mouseenter={handleOpacity}
-      on:mouseleave={handleOpacity}
-      on:mousemove={handleOpacity}
-      on:click={handleOpacity}
-      on:keydown={handleOpacity}
-      on:touchend={handleOpacity}
-    >
-      <div class="controls" style={visible ? "opacity: 0.9" : "opacity: 0"}>
-        <div class="title">
-          <div class="ellipsis unselectable">{name}</div>
+    <div class="timeline">
+      <div class="lower-controls">
+        <div on:click|stopPropagation={handleVolume} on:keypress={handleVolume}>
+          <span class="lower-button unselectable material-symbols-rounded"
+            >{#if !muted}
+              volume_up
+            {:else}
+              volume_mute
+            {/if}
+          </span>
         </div>
-        <div class="buttons">
-          <div
-            on:click|stopPropagation={handleBackward}
-            on:keypress={handleBackward}
+        <div
+          on:click|stopPropagation={handleFullScreen}
+          on:keypress={handleFullScreen}
+        >
+          <span class="lower-button unselectable material-symbols-rounded"
+            >fullscreen</span
           >
-            <span class="button unselectable material-symbols-rounded"
-              >fast_rewind</span
-            >
-          </div>
-          <div on:click|stopPropagation={handlePlay} on:keypress={handlePlay}>
-            <span class="button unselectable material-symbols-rounded">
-              {#if paused}
-                play_arrow
-              {:else if ended}
-                restart_alt
-              {:else}
-                pause
-              {/if}
-            </span>
-          </div>
-          <div
-            on:click|stopPropagation={handleForward}
-            on:keypress={handleForward}
-          >
-            <span class="button unselectable material-symbols-rounded"
-              >fast_forward</span
-            >
-          </div>
-        </div>
-        <div class="timeline">
-          <div class="lower-controls">
-            <div
-              on:click|stopPropagation={handleVolume}
-              on:keypress={handleVolume}
-            >
-              <span class="lower-button unselectable material-symbols-rounded"
-                >{#if !muted}
-                  volume_up
-                {:else}
-                  volume_mute
-                {/if}
-              </span>
-            </div>
-            <div
-              on:click|stopPropagation={handleFullScreen}
-              on:keypress={handleFullScreen}
-            >
-              <span class="lower-button unselectable material-symbols-rounded"
-                >fullscreen</span
-              >
-            </div>
-          </div>
-          <div class="seek">
-            <div class="label-small unselectable">{getTime(time)}</div>
-
-            <input
-              id="seek"
-              class="unselectable"
-              value={time}
-              type="range"
-              {max}
-              on:change|stopPropagation={handleSeek}
-            />
-
-            <div class="label-small unselectable">
-              {getTime(max)}
-            </div>
-          </div>
         </div>
       </div>
-      <video {src} type="video/mp4" id="video">
-        <track kind="captions" />
-      </video>
+      <div class="seek">
+        <div class="label-small unselectable">{getTime(time)}</div>
+
+        <input
+          id="seek"
+          class="unselectable"
+          value={time}
+          type="range"
+          {max}
+          on:change|stopPropagation={handleSeek}
+        />
+
+        <div class="label-small unselectable">
+          {getTime(max)}
+        </div>
+      </div>
     </div>
-  {/if}
+  </div>
+  <video {src} type="video/mp4" id="video">
+    <track kind="captions" />
+  </video>
 </div>
 
 <style>
-  #fileSelector {
-    display: none;
-  }
-  .wrapper {
-    width: 75%;
-    box-sizing: border-box;
-    text-align: center;
-    margin: 0 1rem;
-    height: 100%;
-  }
   .player {
     display: flex;
     position: relative;
@@ -353,28 +307,5 @@
     width: 100%;
     height: 100%;
     border-radius: 1rem;
-  }
-  .selector {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem;
-    height: 100%;
-    box-sizing: border-box;
-    border-width: 3px;
-    border-color: #ece0e0;
-    border-style: dashed;
-    border-radius: 1rem;
-  }
-  .selector:hover {
-    cursor: pointer;
-  }
-
-  @media screen and (max-width: 720px) {
-    .wrapper {
-      width: 100%;
-      box-sizing: border-box;
-      margin: 1rem 0;
-    }
   }
 </style>

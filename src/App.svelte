@@ -1,13 +1,13 @@
 <script>
   import Dashboard from "./lib/Dashboard.svelte";
-  import Player from "./lib/Player.svelte";
-import TopPanel from "./lib/TopPanel.svelte";
+  import Screen from "./lib/Screen.svelte";
+  import TopPanel from "./lib/TopPanel.svelte";
 </script>
 
-  <TopPanel />
-  <main class="background">
+<TopPanel />
+<main class="background">
   <section>
-    <Player />
+    <Screen />
     <Dashboard />
   </section>
 </main>
@@ -18,7 +18,7 @@ import TopPanel from "./lib/TopPanel.svelte";
     height: 90%;
     padding: 1rem;
   }
-  section{
+  section {
     padding: 1rem 0;
     display: flex;
     height: 100%;
