@@ -9,15 +9,15 @@
   let name = "";
   let time = 0;
   let max = 0;
-  let timer;
+  let timer = null;
   let paused = true;
   let ended = false;
   let muted = false;
   let full = false;
   let visible = true;
+  let touch = false;
 
   $: {
-    console.log(files);
     if (files == undefined) {
       selected = false;
     } else if (files.length) {
@@ -52,6 +52,7 @@
   };
 
   const handlePlay = () => {
+    handleOpacity();
     if (ended) {
       player.currentTime = 0;
       player.play();
@@ -66,16 +67,19 @@
     }
   };
   const handleSeek = (e) => {
+    handleOpacity();
     player.currentTime = e.target.value;
   };
-  const forward = () => {
+  const handleForward = () => {
+    handleOpacity();
     if (time + 10 > max) {
       player.currentTime = max - 5;
       return;
     }
     player.currentTime = time + 10;
   };
-  const backward = () => {
+  const handleBackward = () => {
+    handleOpacity();
     if (time - 10 < 0) {
       player.currentTime = 5;
       return;
@@ -83,6 +87,7 @@
     player.currentTime = time - 10;
   };
   const handleVolume = () => {
+    handleOpacity();
     if (muted) {
       player.volume = 1;
     } else {
@@ -91,6 +96,7 @@
     muted = !muted;
   };
   const handleFullScreen = () => {
+    handleOpacity();
     var requestFullScreen =
       wrapper.requestFullScreen ||
       wrapper.mozRequestFullScreen ||
@@ -104,21 +110,36 @@
       full = false;
     }
   };
-  const handleOpacity = (val) => {
+  const resetTimer = () => {
+    if (timer != null) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      visible = false;
+      timer = null;
+    }, 2500);
+  };
+  const handleOpacity = (val = null) => {
+    if (val == null) {
+      // to handle button clicks (invisible button click => visible controls)
+      visible = true;
+      resetTimer();
+      return;
+    }
+    if (val.type == "touchend" && !touch) {
+      // register a touch device
+      touch = true;
+    }
     if (val.type == "mouseleave") {
       visible = false;
+    } else if (val.type == "click" || touch) {
+      visible = !visible;
+      if (visible) {
+        resetTimer();
+      }
     } else {
       visible = true;
-      if (timer == undefined) {
-        timer = setTimeout(() => {
-          visible = false;
-        }, 2500);
-      } else {
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-          visible = false;
-        }, 2500);
-      }
+      resetTimer();
     }
   };
 </script>
@@ -144,33 +165,38 @@
       on:mouseenter={handleOpacity}
       on:mouseleave={handleOpacity}
       on:mousemove={handleOpacity}
+      on:click={handleOpacity}
+      on:keydown={handleOpacity}
+      on:touchend={handleOpacity}
     >
-      <div
-        class="controls"
-        style={visible ? "opacity: 0.9" : "opacity: 0"}
-      >
+      <div class="controls" style={visible ? "opacity: 0.9" : "opacity: 0"}>
         <div class="title">
           <div class="ellipsis unselectable">{name}</div>
         </div>
         <div class="buttons">
-          <div on:click={backward} on:keypress={backward}>
+          <div
+            on:click|stopPropagation={handleBackward}
+            on:keypress={handleBackward}
+          >
             <span class="button unselectable material-symbols-rounded"
               >fast_rewind</span
             >
           </div>
-          <div on:click={handlePlay} on:keypress={handlePlay}>
-            
-              <span class="button unselectable material-symbols-rounded">
-                {#if paused}
-                  play_arrow
-                {:else if ended}
-                  restart_alt
-                {:else}
-                  pause
-                {/if}
-              </span>
+          <div on:click|stopPropagation={handlePlay} on:keypress={handlePlay}>
+            <span class="button unselectable material-symbols-rounded">
+              {#if paused}
+                play_arrow
+              {:else if ended}
+                restart_alt
+              {:else}
+                pause
+              {/if}
+            </span>
           </div>
-          <div on:click={forward} on:keypress={forward}>
+          <div
+            on:click|stopPropagation={handleForward}
+            on:keypress={handleForward}
+          >
             <span class="button unselectable material-symbols-rounded"
               >fast_forward</span
             >
@@ -178,7 +204,10 @@
         </div>
         <div class="timeline">
           <div class="lower-controls">
-            <div on:click={handleVolume} on:keypress={handleVolume}>
+            <div
+              on:click|stopPropagation={handleVolume}
+              on:keypress={handleVolume}
+            >
               <span class="lower-button unselectable material-symbols-rounded"
                 >{#if !muted}
                   volume_up
@@ -187,7 +216,10 @@
                 {/if}
               </span>
             </div>
-            <div on:click={handleFullScreen} on:keypress={handleFullScreen}>
+            <div
+              on:click|stopPropagation={handleFullScreen}
+              on:keypress={handleFullScreen}
+            >
               <span class="lower-button unselectable material-symbols-rounded"
                 >fullscreen</span
               >
@@ -198,10 +230,11 @@
 
             <input
               id="seek"
+              class="unselectable"
               value={time}
               type="range"
               {max}
-              on:change={handleSeek}
+              on:change|stopPropagation={handleSeek}
             />
 
             <div class="label-small unselectable">
