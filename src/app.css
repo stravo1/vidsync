@@ -28,10 +28,10 @@ a:visited {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 .material-symbols-rounded {
   font-variation-settings: "FILL" 1, "wght" 700, "GRAD" 200, "opsz" 48;
 }
+
 
 .unselectable {
   -webkit-touch-callout: none;
@@ -40,6 +40,31 @@ a:visited {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+.divider {
+  margin: 0.75rem 0;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+/* To show the lines on right 
+and left sides of the text */
+.divider::after,
+.divider::before {
+  content: "";
+  border: 1px solid #d6c2c3;
+  flex: 1;
+}
+
+/* Space on left and right sides of text */
+.divider:not(:empty)::before {
+  margin-right: 0.25em;
+}
+
+.divider:not(:empty)::after {
+  margin-left: 0.25em;
 }
 
 #seek {

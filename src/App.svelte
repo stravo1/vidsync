@@ -19,9 +19,10 @@
     padding: 1rem;
   }
   section {
-    padding: 1rem 0;
+    padding: 1rem 1.5rem;
     display: flex;
     height: 100%;
+    overflow-y: auto;
     box-sizing: border-box;
   }
   @media screen and (max-width: 720px) {
