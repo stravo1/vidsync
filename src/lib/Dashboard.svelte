@@ -1,34 +1,27 @@
 <script>
+  import { connected } from "../assets/js/store";
   import Chatbox from "./components/Chatbox.svelte";
   import Room from "./components/Room.svelte";
   import Waiting from "./components/Waiting.svelte";
 
-  const fetchRoomId = async () => {
-    await fetch("/src/assets/27.png");
-    return true;
-  };
-  const joinRoom = async () => {
-    await fetch("/src/assets/27.png");
-    return false;
-  };
-  const create = () => {
-    promise = fetchRoomId();
-  };
-  const join = () => {
-    promise = joinRoom();
-  };
-  let promise = new Promise(() => {});
+  export let promise = new Promise(() => {});
+
+  //let promise = new Promise(() => {});
 </script>
 
 <aside class="surface-variant card">
   <section class="content">
     {#await promise}
-      <Room on:create={create} on:join={join} />
-    {:then bool}
-      {#if bool}
-        <Waiting />
+      <Room on:create on:join />
+    {:then number}
+      {#if number}
+        {#if !$connected}
+          <Waiting roomId={number} />
+        {:else}
+          <Chatbox on:hangup />
+        {/if}
       {:else}
-        <Chatbox />
+        <Chatbox on:hangup />
       {/if}
     {/await}
   </section>
@@ -46,9 +39,7 @@
     border-radius: 1rem;
     filter: drop-shadow();
   }
-  .title {
-    flex-basis: 10%;
-  }
+
   .content {
     width: 100%;
     height: 100%;

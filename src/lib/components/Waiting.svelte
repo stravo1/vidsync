@@ -1,5 +1,6 @@
 <script>
   import connect from "../../assets/14.png";
+  export let roomId;
 </script>
 
 <div class="wrapper">
@@ -10,7 +11,7 @@
     <h2>connecting</h2>
     room id:
     <section class="roomId on-surface-text">
-        oremSumlOritonsecTetu
+        {roomId}
     </section>
     
   </section>

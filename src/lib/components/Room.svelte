@@ -1,13 +1,25 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import kitty from "../../assets/5.png";
+  import { creating, joining } from "../../assets/js/store";
 
+  import kitty from "../../assets/5.png";
+  import Spinner from "./Spinner.svelte";
+
+  let roomId;
   const dispatch = createEventDispatcher();
   const create = () => {
     dispatch("create");
+    creating.set(true);
   };
   const join = () => {
-    dispatch("join");
+    if (!roomId) {
+      alert("please provide room id.");
+      return;
+    }
+    dispatch("join", {
+      roomId: roomId,
+    });
+    joining.set(true);
   };
 </script>
 
@@ -19,12 +31,34 @@
     <h2>welcome!</h2>
     join a room to continue
   </section>
-  <input class="roomId" type="text" placeholder="Enter room id" />
-  <button class="secondary on-secondary-text join" on:click={join}>Join</button>
-  <div class="divider on-surface-variant-text">or</div>
-  <button class="secondary on-secondary-text create" on:click={create}
-    >Create room</button
+  <input
+    class="roomId"
+    type="text"
+    placeholder="Enter room id"
+    bind:value={roomId}
+    disabled={$creating || $joining}
+  />
+  <button
+    class="secondary on-secondary-text join"
+    on:click={join}
+    disabled={$creating || $joining}
   >
+    {#if $joining}
+      <Spinner />
+    {/if}
+    {#if $joining}Joining{:else}Join{/if}
+  </button>
+  <div class="divider on-surface-variant-text">or</div>
+  <button
+    class="secondary on-secondary-text create center"
+    on:click={create}
+    disabled={$creating || $joining}
+  >
+    {#if $creating}
+      <Spinner />
+    {/if}
+    Creat{#if $creating}ing {:else}e room{/if}
+  </button>
 </div>
 
 <style>
@@ -50,11 +84,15 @@
     font-family: "Martian Mono", monospace;
     margin: 1.5rem 0 1rem 0;
   }
+  .roomId:disabled {
+    cursor: not-allowed;
+  }
   .roomId::placeholder {
     font-family: "Martian Mono", monospace;
   }
   button {
     padding: 0.5rem;
+    gap: 0.5rem;
     font-size: large;
     border-radius: 0.5rem;
     border: none;
@@ -68,6 +106,14 @@
   button:hover {
     opacity: 1;
     filter: drop-shadow(5px 10px 5px rgba(0, 0, 0, 0.25));
+  }
+  button:disabled {
+    opacity: 0.75;
+    cursor: not-allowed;
+  }
+  button:hover:disabled {
+    cursor: not-allowed;
+    filter: none;
   }
   .join,
   .create {
