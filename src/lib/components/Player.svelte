@@ -23,12 +23,6 @@
     setTimeout(setPlayer, 100);
   });
 
-  $: if (player == undefined) {
-    max = 0;
-  } else {
-    max = player.duration;
-  }
-
   $: if (subsFile != undefined) {
     setSubs();
   }
@@ -50,19 +44,11 @@
     player = document.getElementById("video");
     subs = document.getElementById("subs");
     wrapper = document.getElementById("player");
-
-    player.addEventListener("loadedmetadata", () => {
-      max = player.duration;
-    });
-    setInterval(() => {
-      time = player.currentTime;
-      ended = player.ended;
-    }, 1000);
   };
   const handlePlay = () => {
     handleOpacity();
     if (ended) {
-      player.currentTime = 0;
+      time = 0;
       player.play();
       return;
     }
@@ -76,23 +62,23 @@
   };
   const handleSeek = (e) => {
     handleOpacity();
-    player.currentTime = e.target.value;
+    time = e.target.value;
   };
   const handleForward = () => {
     handleOpacity();
     if (time + 10 > max) {
-      player.currentTime = max - 5;
+      time = max - 5;
       return;
     }
-    player.currentTime = time + 10;
+    time = time + 10;
   };
   const handleBackward = () => {
     handleOpacity();
     if (time - 10 < 0) {
-      player.currentTime = 5;
+      time = 5;
       return;
     }
-    player.currentTime = time - 10;
+    time = time - 10;
   };
   const handleVolume = () => {
     handleOpacity();
@@ -247,7 +233,7 @@
       </div>
     </div>
   </div>
-  <video {src} type="video/mp4" id="video">
+  <video {src} type="video/mp4" id="video" bind:currentTime={time} bind:duration={max}>
     <track kind="captions" />
     <track kind="subtitles" id="subs" />
   </video>
