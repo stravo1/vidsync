@@ -1,34 +1,56 @@
 <script>
-  import { createEventDispatcher } from "svelte";
-  import {
-    caller,
-    connected,
-    creating,
-    dataChannel,
-    joining,
-    messages,
-  } from "../../assets/js/store";
+  import { createEventDispatcher, onDestroy, onMount } from "svelte";
+  import { commandInterpreter } from "../../assets/js/misc";
+  import { caller, dataChannel, messages } from "../../assets/js/store";
   import ChatBubble from "./ChatBubble.svelte";
 
   let dispatch = createEventDispatcher();
-
+  let box;
   let text;
+  onMount(() => {
+    box = document.getElementsByClassName("box")[0];
+  });
   const sendMessage = () => {
     $dataChannel.send(text);
     messages.update((arr) => [
       ...arr,
       {
-        name: $caller ? "caller" : "callee",
+        name: "me",
         message: text,
         received: false,
         help: false,
       },
     ]);
+    var cmd = /:.+/;
+    if (cmd.test(text)) {
+      commandInterpreter(text);
+    }
+
     text = "";
   };
+
   const hangup = () => {
+    var sure = confirm("Are you sure?");
+    if (!sure) return;
+    messages.update((arr) => [
+      ...arr,
+      {
+        name: "@system",
+        message: "hanging up, please wait...",
+        received: false,
+        help: true,
+      },
+    ]);
     dispatch("hangup");
   };
+  const unsub = messages.subscribe((val) => {
+    if (box != undefined) {
+      setTimeout(() => {
+        box.scrollTop = box.scrollHeight;
+      }, 250);
+    }
+  });
+  onDestroy(unsub);
 </script>
 
 <section class="wrapper">
@@ -90,6 +112,7 @@
     border-style: none;
     border-radius: 0.5rem;
     margin: 1rem 0;
+    scroll-behavior: smooth;
   }
   .input {
     display: flex;

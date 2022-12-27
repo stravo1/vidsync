@@ -15,7 +15,7 @@
     doc,
     collection,
   } from "firebase/firestore";
-  import { firebaseConfig } from "./assets/js/misc";
+  import { commandInterpreter, firebaseConfig } from "./assets/js/misc";
   import {
     caller,
     connected,
@@ -72,6 +72,10 @@
   }
 
   async function createRoom() {
+    if (peerConnection.signalingState == "closed") {
+      peerConnection = null;
+      peerConnection = new RTCPeerConnection(configuration);
+    }
     peerConnection.createDataChannel("probe"); // bitch
 
     const roomRef = doc(collection(db, "rooms"));
@@ -112,6 +116,10 @@
   }
 
   async function joinRoomById(roomId) {
+    if (peerConnection.signalingState == "closed") {
+      peerConnection = null;
+      peerConnection = new RTCPeerConnection(configuration);
+    }
     const roomRef = doc(db, "rooms", roomId);
     const roomSnapshot = await getDoc(roomRef);
     console.log("Got room:", roomSnapshot.exists());
@@ -128,19 +136,33 @@
 
       // Disable input when closed
       channel.addEventListener("close", (event) => {
-        console.log("Channel closes");
+        console.log("Channel closed");
+        messages.update((arr) => [
+          ...arr,
+          {
+            name: "@system",
+            message: "peer disconnected. hanging up...", // guest
+            received: true,
+            help: true,
+          },
+        ]);
+        setTimeout(hangUp, 1000);
       });
       channel.addEventListener("message", (event) => {
         console.log("Message received: " + event.data);
         messages.update((arr) => [
           ...arr,
           {
-            name: "caller",
+            name: "host",
             message: event.data,
             received: true,
             help: false,
           },
         ]);
+        var cmd = /:.+/;
+        if (cmd.test(event.data)) {
+          commandInterpreter(event.data);
+        }
       });
       dataChannel.set(channel);
       collectIceCandidates();
@@ -169,7 +191,7 @@
 
   async function hangUp(e) {
     if (!$caller) {
-      $dataChannel.send(":text");
+      $dataChannel.send("bye bye");
     } else {
       // Delete room on hangup
 
@@ -200,8 +222,10 @@
     creating.set(false);
     joining.set(false);
     dataChannel.set(null);
-    messages.set([]);
     promise = new Promise(() => {});
+    setTimeout(() => {
+      messages.set([]);
+    }, 500);
   }
 
   function registerPeerConnectionListeners() {
@@ -236,19 +260,33 @@
 
         // Disable input when closed
         event.channel.addEventListener("close", (event) => {
-          console.log("Channel closes");
+          console.log("Channel closed");
+          messages.update((arr) => [
+            ...arr,
+            {
+              name: "@system",
+              message: "peer disconnected. hanging up...", // host
+              received: true,
+              help: true,
+            },
+          ]);
+          setTimeout(hangUp, 1000);
         });
         event.channel.addEventListener("message", (event) => {
           console.log("Message received: " + event.data);
           messages.update((arr) => [
             ...arr,
             {
-              name: "callee",
+              name: "guest",
               message: event.data,
               received: true,
               help: false,
             },
           ]);
+          var cmd = /:.+/;
+          if (cmd.test(event.data)) {
+            commandInterpreter(event.data);
+          }
         });
         dataChannel.set(event.channel);
       }

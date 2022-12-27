@@ -2,7 +2,14 @@
   import { default as toWebVTT } from "srt-webvtt";
   import { onMount } from "svelte";
   import { getTime } from "../../assets/js/misc";
-  import { ended, max, paused, subsName, time } from "../../assets/js/store";
+  import {
+    dataChannel,
+    ended,
+    max,
+    paused,
+    subsName,
+    time,
+  } from "../../assets/js/store";
   export let src = "";
   export let name = "";
 
@@ -51,15 +58,33 @@
     }
     if (player.paused) {
       player.play();
+      $dataChannel.send(":play");
       paused.set(false);
     } else {
       player.pause();
-      paused.set(false);
+      $dataChannel.send(":pause");
+      paused.set(true);
     }
   };
   const handleSeek = (e) => {
     handleOpacity();
     time.set(e.target.value);
+    setTimeout(() => {
+      time.set(e.target.value);
+    }, 100);
+    setTimeout(() => {
+      time.set(e.target.value);
+    }, 150);
+    setTimeout(() => {
+      time.set(e.target.value);
+    }, 200);
+    setTimeout(() => {
+      time.set(e.target.value);
+    }, 250);
+    setTimeout(() => {
+      console.log(getTime($time));
+      $dataChannel.send(`:seek ${$time}`);
+    }, 250);
   };
   const handleForward = () => {
     handleOpacity();
@@ -68,6 +93,7 @@
       return;
     }
     time.update((time) => time + 10);
+    $dataChannel.send(`:seek ${$time}`);
   };
   const handleBackward = () => {
     handleOpacity();
@@ -76,6 +102,7 @@
       return;
     }
     time.update((time) => time - 10);
+    $dataChannel.send(`:seek ${$time}`);
   };
   const handleVolume = () => {
     handleOpacity();
