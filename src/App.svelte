@@ -15,12 +15,17 @@
     doc,
     collection,
   } from "firebase/firestore";
-  import { commandInterpreter, firebaseConfig } from "./assets/js/misc";
+  import {
+    commandInterpreter,
+    firebaseConfig,
+    getTime,
+  } from "./assets/js/misc";
   import {
     caller,
     connected,
     creating,
     dataChannel,
+    files,
     joining,
     messages,
   } from "./assets/js/store";
@@ -149,17 +154,22 @@
         setTimeout(hangUp, 1000);
       });
       channel.addEventListener("message", (event) => {
+        var seek = /:seek \d+.\d*/;
         console.log("Message received: " + event.data);
         messages.update((arr) => [
           ...arr,
           {
             name: "host",
-            message: event.data,
+            message: seek.test(event.data)
+              ? event.data.split(" ")[0] +
+                " " +
+                getTime(parseFloat(event.data.split(" ")[1]))
+              : event.data,
             received: true,
             help: false,
           },
         ]);
-        var cmd = /:.+/;
+        var cmd = /^:.+/;
         if (cmd.test(event.data)) {
           commandInterpreter(event.data);
         }
@@ -219,6 +229,7 @@
     }
     unSubIce();
     connected.set(false);
+    files.set(null);
     creating.set(false);
     joining.set(false);
     dataChannel.set(null);
@@ -273,17 +284,22 @@
           setTimeout(hangUp, 1000);
         });
         event.channel.addEventListener("message", (event) => {
+          var seek = /:seek \d+.\d*/;
           console.log("Message received: " + event.data);
           messages.update((arr) => [
             ...arr,
             {
               name: "guest",
-              message: event.data,
+              message: seek.test(event.data)
+                ? event.data.split(" ")[0] +
+                  " " +
+                  getTime(parseFloat(event.data.split(" ")[1]))
+                : event.data,
               received: true,
               help: false,
             },
           ]);
-          var cmd = /:.+/;
+          var cmd = /^:.+/;
           if (cmd.test(event.data)) {
             commandInterpreter(event.data);
           }

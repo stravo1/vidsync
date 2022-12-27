@@ -21,7 +21,7 @@
         help: false,
       },
     ]);
-    var cmd = /:.+/;
+    var cmd = /^:.+/;
     if (cmd.test(text)) {
       commandInterpreter(text);
     }

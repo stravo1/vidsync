@@ -11,4 +11,5 @@ export const ended = writable(false);
 export const time = writable(0);
 export const max = writable(0);
 export const name = writable("");
+export const files = writable(null);
 export const subsName = writable("");

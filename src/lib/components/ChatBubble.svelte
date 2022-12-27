@@ -20,12 +20,13 @@
     width: 90%;
     box-sizing: border-box;
     margin: 1rem 0.25rem;
+    overflow-x: scroll;
+    border-radius: 0.25rem;
   }
   .wrapper > div {
     background-color: #e5bdc2;
     color: #660026;
     padding: 0.5rem;
-    border-radius: 0.25rem;
     width: fit-content;
     opacity: 0.9;
   }

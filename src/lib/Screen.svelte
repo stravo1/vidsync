@@ -1,42 +1,46 @@
 <script>
-  import { name } from "../assets/js/store";
+  import { dataChannel, files, name } from "../assets/js/store";
   import Player from "./components/Player.svelte";
 
-  let files;
-  let selected;
+  //let files;
+  //let selected;
   let src;
 
   $: {
-    if (files == undefined) {
-      selected = false;
-    } else if (files.length) {
-      selected = true;
-      src = URL.createObjectURL(files[0]);
-      name.set(files[0].name);
+    if ($files == null) {
+      name.set("");
+    } else if ($files.length) {
+      src = URL.createObjectURL($files[0]);
+      name.set($files[0].name);
+      $dataChannel.send(":set-video " + $name);
     }
   }
 
   const clickOpen = () => {
+    if ($dataChannel == undefined) {
+      alert("Please join a room first!");
+      return;
+    }
     document.getElementById("fileSelector").click();
   };
 </script>
 
 <div class="wrapper">
-  {#if !selected}
+  {#if $name == ""}
     <div
       class="selector on-background-text"
       on:click={clickOpen}
       on:keypress={clickOpen}
     >
       <div>
-        <input type="file" accept="video/*" bind:files id="fileSelector" />
+        <input type="file" accept="video/*" bind:files={$files} id="fileSelector" />
         <span class="material-symbols-rounded"> add </span>
         <br />
         select a video file
       </div>
     </div>
   {:else}
-    <Player {src} name={$name} />
+    <Player {src} />
   {/if}
 </div>
 

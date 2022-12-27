@@ -1,4 +1,5 @@
-import { messages, paused, time } from "./store";
+import { dataChannel, messages, name, paused, subsName, time } from "./store";
+import { get } from "svelte/store";
 
 const getTime = (time) => {
   var val = "";
@@ -31,6 +32,8 @@ const firebaseConfig = {
 
 const commandInterpreter = (command) => {
   var seek = /:seek \d+.\d*/;
+  var setVid = /:set-video \w+/;
+  var setSub = /:set-sub \w+/;
   var text = "";
   switch (command) {
     case ":play":
@@ -59,6 +62,40 @@ const commandInterpreter = (command) => {
           time.set(timeStamp);
         }, 250);
         text = `seeking to ${getTime(timeStamp)}`;
+        break;
+      } else if (setVid.test(command)) {
+        var arr = command.split(" ");
+        arr.splice(0, 1);
+        var file = arr.join(" ");
+        var $nameVal = get(name);
+        var $datachannelVal = get(dataChannel);
+
+        text = "Peer selectd a video file.\n";
+        if ($nameVal == "") {
+          text += "Select a file.";
+        } else if ($nameVal == file) {
+          text += "It's a match!";
+          $datachannelVal.send("Videos matched :)");
+        } else {
+          text += "File names didn't match.";
+        }
+        break;
+      } else if (setSub.test(command)) {
+        var arr = command.split(" ");
+        arr.splice(0, 1);
+        var file = arr.join(" ");
+        var $nameVal = get(subsName);
+        var $datachannelVal = get(dataChannel);
+
+        text = "Peer selectd a subtitle file.\n";
+        if ($nameVal == "") {
+          text += "Select a file.";
+        } else if ($nameVal == file) {
+          text += "It's a match!";
+          $datachannelVal.send("Subtitles matched :)");
+        } else {
+          text += "File names didn't match.";
+        }
         break;
       }
 
