@@ -1,10 +1,10 @@
 <script>
+  import { name } from "../assets/js/store";
   import Player from "./components/Player.svelte";
 
   let files;
   let selected;
   let src;
-  let name = "";
 
   $: {
     if (files == undefined) {
@@ -12,7 +12,7 @@
     } else if (files.length) {
       selected = true;
       src = URL.createObjectURL(files[0]);
-      name = files[0].name;
+      name.set(files[0].name);
     }
   }
 
@@ -36,7 +36,7 @@
       </div>
     </div>
   {:else}
-    <Player {src} {name} />
+    <Player {src} name={$name} />
   {/if}
 </div>
 

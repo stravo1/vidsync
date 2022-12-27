@@ -2,6 +2,7 @@
   import { default as toWebVTT } from "srt-webvtt";
   import { onMount } from "svelte";
   import { getTime } from "../../assets/js/misc";
+  import { ended, max, paused, subsName, time } from "../../assets/js/store";
   export let src = "";
   export let name = "";
 
@@ -9,11 +10,7 @@
   let wrapper;
   let subsFile;
   let subs;
-  let time = 0;
-  let max = 0;
   let timer = null;
-  let paused = true;
-  let ended = false;
   let muted = false;
   let full = false;
   let visible = true;
@@ -38,7 +35,7 @@
     }
     subs.src = url;
     player.textTracks[1].mode = "showing";
-    console.log(subsFile[0].type);
+    subsName.set(subsFile[0].name);
   };
   const setPlayer = (e) => {
     player = document.getElementById("video");
@@ -47,38 +44,38 @@
   };
   const handlePlay = () => {
     handleOpacity();
-    if (ended) {
-      time = 0;
+    if ($ended) {
+      time.set(0);
       player.play();
       return;
     }
     if (player.paused) {
       player.play();
-      paused = false;
+      paused.set(false);
     } else {
       player.pause();
-      paused = true;
+      paused.set(false);
     }
   };
   const handleSeek = (e) => {
     handleOpacity();
-    time = e.target.value;
+    time.set(e.target.value);
   };
   const handleForward = () => {
     handleOpacity();
-    if (time + 10 > max) {
-      time = max - 5;
+    if ($time + 10 > $max) {
+      time.set($max - 5);
       return;
     }
-    time = time + 10;
+    time.update((time) => time + 10);
   };
   const handleBackward = () => {
     handleOpacity();
-    if (time - 10 < 0) {
-      time = 5;
+    if ($time - 10 < 0) {
+      time.set(3);
       return;
     }
-    time = time - 10;
+    time.update((time) => time - 10);
   };
   const handleVolume = () => {
     handleOpacity();
@@ -173,9 +170,9 @@
       </div>
       <div on:click|stopPropagation={handlePlay} on:keypress={handlePlay}>
         <span class="button unselectable material-symbols-rounded">
-          {#if paused}
+          {#if $paused && !$ended}
             play_arrow
-          {:else if ended}
+          {:else if $ended}
             restart_alt
           {:else}
             pause
@@ -216,24 +213,31 @@
         </div>
       </div>
       <div class="seek">
-        <div class="label-small unselectable">{getTime(time)}</div>
+        <div class="label-small unselectable">{getTime($time)}</div>
 
         <input
           id="seek"
           class="unselectable"
-          value={time}
+          value={$time}
           type="range"
-          {max}
+          max={$max}
           on:change|stopPropagation={handleSeek}
         />
 
         <div class="label-small unselectable">
-          {getTime(max)}
+          {getTime($max)}
         </div>
       </div>
     </div>
   </div>
-  <video {src} type="video/mp4" id="video" bind:currentTime={time} bind:duration={max}>
+  <video
+    {src}
+    id="video"
+    bind:currentTime={$time}
+    bind:duration={$max}
+    bind:paused={$paused}
+    bind:ended={$ended}
+  >
     <track kind="captions" />
     <track kind="subtitles" id="subs" />
   </video>

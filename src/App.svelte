@@ -275,6 +275,7 @@
   main {
     box-sizing: border-box;
     height: 90%;
+    overflow-y: auto;
     padding: 1rem;
   }
   section {
@@ -282,7 +283,6 @@
     display: flex;
     justify-content: center;
     height: 100%;
-    overflow-y: auto;
     box-sizing: border-box;
   }
   @media screen and (max-width: 720px) {
