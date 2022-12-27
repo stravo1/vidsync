@@ -30,7 +30,7 @@
   };
 
   const hangup = () => {
-    var sure = confirm("Are you sure?");
+    var sure = confirm("Leave room?");
     if (!sure) return;
     messages.update((arr) => [
       ...arr,
@@ -57,7 +57,7 @@
   <section class="top on-surface-variant-text">
     <h3>messages</h3>
     <div class="hangup" on:click={hangup} on:keypress={hangup}>
-      <span class="material-symbols-rounded"> logout </span>
+      <span class="material-symbols-rounded"> power_rounded </span>
     </div>
   </section>
   <div class="box">

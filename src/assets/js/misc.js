@@ -31,7 +31,7 @@ const firebaseConfig = {
 };
 
 const commandInterpreter = (command) => {
-  var seek = /:seek \d+.\d*/;
+  var seek = /:seek \d+/;
   var setVid = /:set-video \w+/;
   var setSub = /:set-sub \w+/;
   var text = "";
