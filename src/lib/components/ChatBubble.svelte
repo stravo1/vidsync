@@ -28,6 +28,7 @@
     color: #660026;
     padding: 0.5rem;
     width: fit-content;
+    border-radius: 0.25rem;
     opacity: 0.9;
   }
   .received {

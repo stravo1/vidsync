@@ -1,5 +1,5 @@
 <script>
-  import connect from "../../assets/14.png";
+  import connect from "../../assets/images/14.png";
   export let roomId;
 </script>
 

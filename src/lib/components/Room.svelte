@@ -2,7 +2,7 @@
   import { createEventDispatcher } from "svelte";
   import { creating, joining } from "../../assets/js/store";
 
-  import kitty from "../../assets/5.png";
+  import kitty from "../../assets/images/5.png";
   import Spinner from "./Spinner.svelte";
 
   let roomId;

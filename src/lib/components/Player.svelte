@@ -5,6 +5,7 @@
   import {
     dataChannel,
     ended,
+    files,
     max,
     name,
     paused,
@@ -12,7 +13,6 @@
     time,
   } from "../../assets/js/store";
   export let src = "";
-  
 
   let player;
   let wrapper;
@@ -119,7 +119,7 @@
     document.getElementById("subsFile").click();
   };
   const handleClear = () => {
-    name.set("")
+    files.set(null);
   };
   const handleFullScreen = () => {
     handleOpacity();
@@ -190,10 +190,12 @@
   <div class="controls" style={visible ? "opacity: 0.9" : "opacity: 0"}>
     <div class="title">
       <div class="ellipsis unselectable">{$name}</div>
-      <div class="lower-button unselectable" on:click={handleClear} on:keypress={handleClear}>
-        <span class="unselectable material-symbols-rounded"
-          >close</span
-        >
+      <div
+        class="lower-button unselectable"
+        on:click={handleClear}
+        on:keypress={handleClear}
+      >
+        <span class="unselectable material-symbols-rounded">close</span>
       </div>
     </div>
     <div class="buttons">

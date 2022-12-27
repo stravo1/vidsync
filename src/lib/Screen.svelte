@@ -2,8 +2,6 @@
   import { dataChannel, files, name } from "../assets/js/store";
   import Player from "./components/Player.svelte";
 
-  //let files;
-  //let selected;
   let src;
 
   $: {
