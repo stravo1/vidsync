@@ -200,7 +200,7 @@
   }
 
   async function hangUp(e) {
-    if (!$caller) {
+    if (!$caller && $dataChannel.readyState == "open") {
       $dataChannel.send("bye bye");
     } else {
       // Delete room on hangup

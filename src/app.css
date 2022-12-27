@@ -140,3 +140,8 @@ and left sides of the text */
 #seek::-ms-tooltip {
   display: none;
 }
+
+
+::-webkit-scrollbar {
+  display: none;
+}
