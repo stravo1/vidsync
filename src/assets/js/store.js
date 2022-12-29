@@ -1,5 +1,7 @@
 import { writable } from "svelte/store";
 
+export const loggedIn = writable(false);
+export const authObj = writable(null);
 export const creating = writable(false);
 export const joining = writable(false);
 export const connected = writable(false);

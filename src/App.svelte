@@ -15,12 +15,15 @@
     doc,
     collection,
   } from "firebase/firestore";
+  import { getAuth } from "firebase/auth";
   import {
     commandInterpreter,
     firebaseConfig,
     getTime,
+    registerPeerConnectionListeners,
   } from "./assets/js/misc";
   import {
+    authObj,
     caller,
     connected,
     creating,
@@ -54,6 +57,9 @@
   const app = initializeApp(firebaseConfig);
   // Initialize Firestore
   const db = getFirestore(app);
+  // Initialize Firesbase Auth
+  const auth = getAuth(app);
+  authObj.set(auth);
 
   async function collectIceCandidates() {
     peerConnection.addEventListener("icecandidate", (e) => {
@@ -90,7 +96,56 @@
     remoteName = "callee";
 
     collectIceCandidates();
-    registerPeerConnectionListeners(); // bitch 2
+    registerPeerConnectionListeners(peerConnection); // bitch 2
+    peerConnection.addEventListener("datachannel", (event) => {
+      console.log("Datachannel detected: ", event.channel.label);
+
+      if (event.channel.label == "main") {
+        connected.set(true);
+        caller.set(true);
+        event.channel.addEventListener("open", (event) => {
+          console.log("Channel opened");
+        });
+
+        // Disable input when closed
+        event.channel.addEventListener("close", (event) => {
+          console.log("Channel closed");
+          messages.update((arr) => [
+            ...arr,
+            {
+              name: "@system",
+              message: "peer disconnected. hanging up...", // host
+              received: true,
+              help: true,
+            },
+          ]);
+          setTimeout(hangUp, 1000);
+          console.log(108);
+        });
+        event.channel.addEventListener("message", (event) => {
+          var seek = /:seek \d+.\d*/;
+          console.log("Message received: " + event.data);
+          messages.update((arr) => [
+            ...arr,
+            {
+              name: "guest",
+              message: seek.test(event.data)
+                ? event.data.split(" ")[0] +
+                  " " +
+                  getTime(parseFloat(event.data.split(" ")[1]))
+                : event.data,
+              received: true,
+              help: false,
+            },
+          ]);
+          var cmd = /^:.+/;
+          if (cmd.test(event.data)) {
+            commandInterpreter(event.data);
+          }
+        });
+        dataChannel.set(event.channel);
+      }
+    });
 
     // Code for creating a room
 
@@ -176,7 +231,7 @@
       });
       dataChannel.set(channel);
       collectIceCandidates();
-      registerPeerConnectionListeners();
+      registerPeerConnectionListeners(peerConnection);
 
       // Code for creating SDP answer below
       const offer = roomSnapshot.data().offer;
@@ -239,75 +294,6 @@
     }, 500);
   }
 
-  function registerPeerConnectionListeners() {
-    peerConnection.addEventListener("icegatheringstatechange", () => {
-      console.log(
-        `ICE gathering state changed: ${peerConnection.iceGatheringState}`
-      );
-    });
-
-    peerConnection.addEventListener("connectionstatechange", () => {
-      console.log(`Connection state change: ${peerConnection.connectionState}`);
-    });
-
-    peerConnection.addEventListener("signalingstatechange", () => {
-      console.log(`Signaling state change: ${peerConnection.signalingState}`);
-    });
-
-    peerConnection.addEventListener("iceconnectionstatechange ", () => {
-      console.log(
-        `ICE connection state change: ${peerConnection.iceConnectionState}`
-      );
-    });
-    peerConnection.addEventListener("datachannel", (event) => {
-      console.log("Datachannel detected: ", event.channel.label);
-
-      if (event.channel.label == "main") {
-        connected.set(true);
-        caller.set(true);
-        event.channel.addEventListener("open", (event) => {
-          console.log("Channel opened");
-        });
-
-        // Disable input when closed
-        event.channel.addEventListener("close", (event) => {
-          console.log("Channel closed");
-          messages.update((arr) => [
-            ...arr,
-            {
-              name: "@system",
-              message: "peer disconnected. hanging up...", // host
-              received: true,
-              help: true,
-            },
-          ]);
-          setTimeout(hangUp, 1000);
-        });
-        event.channel.addEventListener("message", (event) => {
-          var seek = /:seek \d+.\d*/;
-          console.log("Message received: " + event.data);
-          messages.update((arr) => [
-            ...arr,
-            {
-              name: "guest",
-              message: seek.test(event.data)
-                ? event.data.split(" ")[0] +
-                  " " +
-                  getTime(parseFloat(event.data.split(" ")[1]))
-                : event.data,
-              received: true,
-              help: false,
-            },
-          ]);
-          var cmd = /^:.+/;
-          if (cmd.test(event.data)) {
-            commandInterpreter(event.data);
-          }
-        });
-        dataChannel.set(event.channel);
-      }
-    });
-  }
   const create = () => {
     promise = createRoom();
   };

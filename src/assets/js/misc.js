@@ -1,5 +1,36 @@
-import { dataChannel, messages, name, paused, subsName, time } from "./store";
+import {
+  caller,
+  connected,
+  dataChannel,
+  messages,
+  name,
+  paused,
+  subsName,
+  time,
+} from "./store";
+import {
+  getFirestore,
+  addDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  doc,
+  collection,
+} from "firebase/firestore";
 import { get } from "svelte/store";
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCt8Eit11OTXtqOA1fgIDS98_WfjWMT2t0",
+  authDomain: "synkvid.firebaseapp.com",
+  projectId: "synkvid",
+  storageBucket: "synkvid.appspot.com",
+  messagingSenderId: "855901352282",
+  appId: "1:855901352282:web:6fdc5569fa7854f8784363",
+};
 
 const getTime = (time) => {
   var val = "";
@@ -20,15 +51,6 @@ const getTime = (time) => {
   return val;
 };
 
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyCt8Eit11OTXtqOA1fgIDS98_WfjWMT2t0",
-  authDomain: "synkvid.firebaseapp.com",
-  projectId: "synkvid",
-  storageBucket: "synkvid.appspot.com",
-  messagingSenderId: "855901352282",
-  appId: "1:855901352282:web:6fdc5569fa7854f8784363",
-};
 
 const commandInterpreter = (command) => {
   var seek = /:seek \d+/;
@@ -111,4 +133,32 @@ const commandInterpreter = (command) => {
     },
   ]);
 };
-export { getTime, firebaseConfig, commandInterpreter };
+
+const registerPeerConnectionListeners = (peerConnection) => {
+  peerConnection.addEventListener("icegatheringstatechange", () => {
+    console.log(
+      `ICE gathering state changed: ${peerConnection.iceGatheringState}`
+    );
+  });
+
+  peerConnection.addEventListener("connectionstatechange", () => {
+    console.log(`Connection state change: ${peerConnection.connectionState}`);
+  });
+
+  peerConnection.addEventListener("signalingstatechange", () => {
+    console.log(`Signaling state change: ${peerConnection.signalingState}`);
+  });
+
+  peerConnection.addEventListener("iceconnectionstatechange ", () => {
+    console.log(
+      `ICE connection state change: ${peerConnection.iceConnectionState}`
+    );
+  });
+}
+
+export {
+  getTime,
+  firebaseConfig,
+  commandInterpreter,
+  registerPeerConnectionListeners,
+};
