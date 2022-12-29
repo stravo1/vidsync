@@ -2,7 +2,7 @@
   import { createEventDispatcher } from "svelte";
   import { creating, joining } from "../../assets/js/store";
 
-  import kitty from "../../assets/images/5.png";
+  import kitty from "../../assets/images/5.svg";
   import Spinner from "./Spinner.svelte";
 
   let roomId;
@@ -67,9 +67,11 @@
     height: fit-content;
     box-sizing: border-box;
     margin: 2rem 0 1rem 0;
+    overflow-x: hidden;
   }
   img {
     width: 90%;
+    scale: 1.25;
   }
   .info {
     margin: 1rem 0;

@@ -1,5 +1,5 @@
 <script>
-  import connect from "../../assets/images/14.png";
+  import connect from "../../assets/images/14.svg";
   export let roomId;
 </script>
 
@@ -26,10 +26,12 @@
     flex-direction: column;
     justify-content: center;
     box-sizing: border-box;
+    overflow-x: hidden;
     margin: 2rem 0 1rem 0;
   }
   img {
     width: 90%;
+    scale: 1.25;
   }
   .info {
     margin: 1rem 0;
