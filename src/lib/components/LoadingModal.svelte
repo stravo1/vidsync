@@ -27,6 +27,7 @@
   .loadingCard {
     display: none;
     gap: 1rem;
+    min-width: 15rem;
     width: 25vw;
     height: 6rem;
     margin: 45vh auto;
