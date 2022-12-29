@@ -7,7 +7,6 @@
     signInWithPopup,
   } from "firebase/auth";
   import { loaded, loggedIn } from "../assets/js/store";
-  import Spinner from "./components/Spinner.svelte";
   import LoadingModal from "./components/LoadingModal.svelte";
 
   export let auth;

@@ -7,6 +7,7 @@ export const user = writable(null);
 
 /* room n connection */
 export const creating = writable(false);
+export const waiting = writable(false);
 export const joining = writable(false);
 export const connected = writable(false);
 export const peerName = writable(null);

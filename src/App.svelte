@@ -35,6 +35,7 @@
     messages,
     peerName,
     user,
+    waiting,
   } from "./assets/js/store";
   import Auth from "./lib/Auth.svelte";
   import LoadingModal from "./lib/components/LoadingModal.svelte";
@@ -104,6 +105,7 @@
   }
 
   async function createRoom() {
+    caller.set(true);
     if (peerConnection.signalingState == "closed") {
       // after disconnecting from a previous session
       peerConnection = null;
@@ -124,7 +126,7 @@
 
       if (event.channel.label == "main") {
         connected.set(true);
-        caller.set(true);
+        waiting.set(true);
         event.channel.addEventListener("open", (event) => {
           console.log("Channel opened");
           $dataChannel.send(`:name ${$user.displayName}`); // exchange names
@@ -143,7 +145,6 @@
             },
           ]);
           setTimeout(hangUp, 1000);
-          console.log(108);
         });
         event.channel.addEventListener("message", (event) => {
           var seek = /:seek \d+.\d*/;
@@ -197,10 +198,12 @@
       }
     });
     // Listen for remote ICE candidates below
+    waiting.set(true);
     return roomId;
   }
 
   async function joinRoomById(roomId) {
+    caller.set(false);
     if (peerConnection.signalingState == "closed") {
       peerConnection = null;
       peerConnection = new RTCPeerConnection(configuration);
@@ -284,7 +287,7 @@
   }
 
   async function hangUp(e) {
-    if (!$connected) {
+    if (!$connected && !$waiting) {
       // prevent multiple hangUp  calls
       return;
     }
@@ -319,6 +322,7 @@
     }
     unSubIce();
     connected.set(false);
+    waiting.set(false);
     files.set(null);
     creating.set(false);
     joining.set(false);

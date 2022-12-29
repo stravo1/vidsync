@@ -16,7 +16,7 @@
     {:then number}
       {#if number}
         {#if !$connected}
-          <Waiting roomId={number} />
+          <Waiting roomId={number} on:hangup />
         {:else}
           <Chatbox on:hangup />
         {/if}
