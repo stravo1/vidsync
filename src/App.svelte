@@ -20,6 +20,7 @@
     commandInterpreter,
     firebaseConfig,
     getTime,
+    registerChannelEventListeners,
     registerPeerConnectionListeners,
   } from "./assets/js/misc";
   import {
@@ -127,49 +128,8 @@
       if (event.channel.label == "main") {
         connected.set(true);
         waiting.set(true);
-        event.channel.addEventListener("open", (event) => {
-          console.log("Channel opened");
-          $dataChannel.send(`:name ${$user.displayName}`); // exchange names
-        });
-
-        // Disable input when closed
-        event.channel.addEventListener("close", (event) => {
-          console.log("Channel closed");
-          messages.update((arr) => [
-            ...arr,
-            {
-              name: "@system",
-              message: "peer disconnected. hanging up...", // host
-              received: true,
-              help: true,
-            },
-          ]);
-          setTimeout(hangUp, 1000);
-        });
-        event.channel.addEventListener("message", (event) => {
-          var seek = /:seek \d+.\d*/;
-          console.log("Message received: " + event.data);
-          if ($peerName != null) {
-            messages.update((arr) => [
-              ...arr,
-              {
-                name: $peerName,
-                message: seek.test(event.data)
-                  ? event.data.split(" ")[0] +
-                    " " +
-                    getTime(parseFloat(event.data.split(" ")[1]))
-                  : event.data,
-                received: true,
-                help: false,
-              },
-            ]);
-          }
-          var cmd = /^:.+/;
-          if (cmd.test(event.data)) {
-            commandInterpreter(event.data);
-          }
-        });
         dataChannel.set(event.channel);
+        registerChannelEventListeners(event.channel, hangUp);
       }
     });
 
@@ -217,51 +177,8 @@
       remoteName = "caller";
 
       var channel = peerConnection.createDataChannel("main"); // bitch
-      channel.addEventListener("open", (event) => {
-        console.log("Channel opened");
-        connected.set(true);
-        $dataChannel.send(`:name ${$user.displayName}`); // exchange each other's names
-      });
-
-      // Disable input when closed
-      channel.addEventListener("close", (event) => {
-        console.log("Channel closed");
-        messages.update((arr) => [
-          ...arr,
-          {
-            name: "@system",
-            message: "peer disconnected. hanging up...", // guest
-            received: true,
-            help: true,
-          },
-        ]);
-        setTimeout(hangUp, 1000);
-      });
-      channel.addEventListener("message", (event) => {
-        var seek = /:seek \d+.\d*/;
-        console.log("Message received: " + event.data);
-        if ($peerName != null) {
-          // add to message box only after name exchange is complete
-          messages.update((arr) => [
-            ...arr,
-            {
-              name: $peerName,
-              message: seek.test(event.data)
-                ? event.data.split(" ")[0] +
-                  " " +
-                  getTime(parseFloat(event.data.split(" ")[1]))
-                : event.data,
-              received: true,
-              help: false,
-            },
-          ]);
-        }
-        var cmd = /^:.+/;
-        if (cmd.test(event.data)) {
-          commandInterpreter(event.data);
-        }
-      });
       dataChannel.set(channel);
+      registerChannelEventListeners(channel, hangUp);
       collectIceCandidates();
       registerPeerConnectionListeners(peerConnection);
 
