@@ -28,7 +28,7 @@
     <img src={kitty} alt=":)" />
   </div>
   <section class="on-surface-variant-text info">
-    <h2>welcome!</h2>
+    <h2>hello!</h2>
     join a room to continue
   </section>
   <input
@@ -68,6 +68,7 @@
     box-sizing: border-box;
     margin: 2rem 0 1rem 0;
     overflow-x: hidden;
+    padding-bottom: 1rem;
   }
   img {
     width: 90%;
@@ -84,7 +85,7 @@
     border-radius: 0.5rem;
     border: none;
     font-family: "Martian Mono", monospace;
-    margin: 1.5rem 0 1rem 0;
+    margin: 1rem 0 1rem 0;
   }
   .roomId:disabled {
     cursor: not-allowed;
@@ -94,8 +95,8 @@
   }
   button {
     padding: 0.5rem;
-    gap: 0.5rem;
     font-size: large;
+    gap: 0.5rem;
     border-radius: 0.5rem;
     border: none;
     font-family: "Martian Mono", monospace;
@@ -122,6 +123,6 @@
     width: 100%;
   }
   .create {
-    padding: 0.75rem;
+    padding: 0.65rem;
   }
 </style>

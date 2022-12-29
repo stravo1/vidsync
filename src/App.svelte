@@ -15,7 +15,7 @@
     doc,
     collection,
   } from "firebase/firestore";
-  import { getAuth } from "firebase/auth";
+  import { getAuth, onAuthStateChanged } from "firebase/auth";
   import {
     commandInterpreter,
     firebaseConfig,
@@ -30,8 +30,14 @@
     dataChannel,
     files,
     joining,
+    loaded,
+    loggedIn,
     messages,
+    peerName,
+    user,
   } from "./assets/js/store";
+  import Auth from "./lib/Auth.svelte";
+  import LoadingModal from "./lib/components/LoadingModal.svelte";
 
   const configuration = {
     iceServers: [
@@ -46,6 +52,7 @@
   };
 
   let peerConnection = new RTCPeerConnection(configuration);
+  let hanging = false;
   let roomId = null;
   let localName;
   let remoteName;
@@ -55,17 +62,31 @@
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
+
   // Initialize Firestore
   const db = getFirestore(app);
+
   // Initialize Firesbase Auth
   const auth = getAuth(app);
   authObj.set(auth);
+  onAuthStateChanged(auth, (u) => {
+    if (u) {
+      user.set(u);
+      loaded.set(true);
+      loggedIn.set(true);
+    } else {
+      loaded.set(true);
+      loggedIn.set(false);
+    }
+  });
 
+  // add own ICE candidates to the database and retrieve peer's ICE candidates from database
   async function collectIceCandidates() {
     peerConnection.addEventListener("icecandidate", (e) => {
+      // listening to addition in own ICE candidate's list
       if (e.candidate) {
         const json = e.candidate.toJSON();
-        addDoc(collection(db, "rooms", roomId, localName), json);
+        addDoc(collection(db, "rooms", roomId, localName), json); // adding on ICE candidates to database
       }
     });
     unSubIce = onSnapshot(
@@ -73,7 +94,7 @@
       (snapshot) => {
         snapshot.docChanges().forEach((change) => {
           if (change.type === "added") {
-            console.log("adding ice ;)");
+            console.log("adding ice ;)"); // adding peer's ICE candidates after fetching them from database
             const candidate = new RTCIceCandidate(change.doc.data());
             peerConnection.addIceCandidate(candidate);
           }
@@ -84,8 +105,9 @@
 
   async function createRoom() {
     if (peerConnection.signalingState == "closed") {
+      // after disconnecting from a previous session
       peerConnection = null;
-      peerConnection = new RTCPeerConnection(configuration);
+      peerConnection = new RTCPeerConnection(configuration); // create a new peerConnection
     }
     peerConnection.createDataChannel("probe"); // bitch
 
@@ -105,6 +127,7 @@
         caller.set(true);
         event.channel.addEventListener("open", (event) => {
           console.log("Channel opened");
+          $dataChannel.send(`:name ${$user.displayName}`); // exchange names
         });
 
         // Disable input when closed
@@ -125,19 +148,21 @@
         event.channel.addEventListener("message", (event) => {
           var seek = /:seek \d+.\d*/;
           console.log("Message received: " + event.data);
-          messages.update((arr) => [
-            ...arr,
-            {
-              name: "guest",
-              message: seek.test(event.data)
-                ? event.data.split(" ")[0] +
-                  " " +
-                  getTime(parseFloat(event.data.split(" ")[1]))
-                : event.data,
-              received: true,
-              help: false,
-            },
-          ]);
+          if ($peerName != null) {
+            messages.update((arr) => [
+              ...arr,
+              {
+                name: $peerName,
+                message: seek.test(event.data)
+                  ? event.data.split(" ")[0] +
+                    " " +
+                    getTime(parseFloat(event.data.split(" ")[1]))
+                  : event.data,
+                received: true,
+                help: false,
+              },
+            ]);
+          }
           var cmd = /^:.+/;
           if (cmd.test(event.data)) {
             commandInterpreter(event.data);
@@ -192,6 +217,7 @@
       channel.addEventListener("open", (event) => {
         console.log("Channel opened");
         connected.set(true);
+        $dataChannel.send(`:name ${$user.displayName}`); // exchange each other's names
       });
 
       // Disable input when closed
@@ -211,19 +237,22 @@
       channel.addEventListener("message", (event) => {
         var seek = /:seek \d+.\d*/;
         console.log("Message received: " + event.data);
-        messages.update((arr) => [
-          ...arr,
-          {
-            name: "host",
-            message: seek.test(event.data)
-              ? event.data.split(" ")[0] +
-                " " +
-                getTime(parseFloat(event.data.split(" ")[1]))
-              : event.data,
-            received: true,
-            help: false,
-          },
-        ]);
+        if ($peerName != null) {
+          // add to message box only after name exchange is complete
+          messages.update((arr) => [
+            ...arr,
+            {
+              name: $peerName,
+              message: seek.test(event.data)
+                ? event.data.split(" ")[0] +
+                  " " +
+                  getTime(parseFloat(event.data.split(" ")[1]))
+                : event.data,
+              received: true,
+              help: false,
+            },
+          ]);
+        }
         var cmd = /^:.+/;
         if (cmd.test(event.data)) {
           commandInterpreter(event.data);
@@ -255,6 +284,12 @@
   }
 
   async function hangUp(e) {
+    if (!$connected) {
+      // prevent multiple hangUp  calls
+      return;
+    }
+    hanging = true; // start modal
+
     if (!$caller && $dataChannel.readyState == "open") {
       $dataChannel.send("bye bye");
     } else {
@@ -288,9 +323,11 @@
     creating.set(false);
     joining.set(false);
     dataChannel.set(null);
+    peerName.set(null);
     promise = new Promise(() => {});
     setTimeout(() => {
       messages.set([]);
+      hanging = false; // removing modal
     }, 500);
   }
 
@@ -303,13 +340,15 @@
   };
 </script>
 
-<TopPanel />
+<TopPanel {auth} />
 <main class="background">
   <section>
     <Screen />
     <Dashboard on:create={create} on:join={join} on:hangup={hangUp} {promise} />
   </section>
 </main>
+<Auth {auth} />
+<LoadingModal visible={hanging} />
 
 <style>
   main {

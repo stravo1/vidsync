@@ -5,6 +5,7 @@ import {
   messages,
   name,
   paused,
+  peerName,
   subsName,
   time,
 } from "./store";
@@ -51,11 +52,13 @@ const getTime = (time) => {
   return val;
 };
 
-
 const commandInterpreter = (command) => {
+  /* all reg-ex */
+  var nameSet = /:name \w+/;
   var seek = /:seek \d+/;
   var setVid = /:set-video \w+/;
   var setSub = /:set-sub \w+/;
+
   var text = "";
   switch (command) {
     case ":play":
@@ -66,7 +69,14 @@ const commandInterpreter = (command) => {
       paused.set(true);
       text = "pausing video";
       break;
-
+    case ":help":
+      text = `
+      :pause => pause video \n
+      :play => play video \n
+      :seek n => seek to nth second \n
+      :name n => set your username to n for this session \n
+      `;
+      break;
     default:
       if (seek.test(command)) {
         var timeStamp = parseFloat(seek.exec(command)[0].split(" ")[1]);
@@ -119,6 +129,13 @@ const commandInterpreter = (command) => {
           text += "File names didn't match.";
         }
         break;
+      } else if (nameSet.test(command)) {
+        var arr = command.split(" ");
+        arr.splice(0, 1);
+        var peer = arr.join(" ");
+        peerName.set(peer);
+        text = `${peer} joined! say hello :)`;
+        break;
       }
 
       text = "oops! try again \n use :help to get list of all commands";
@@ -154,7 +171,7 @@ const registerPeerConnectionListeners = (peerConnection) => {
       `ICE connection state change: ${peerConnection.iceConnectionState}`
     );
   });
-}
+};
 
 export {
   getTime,

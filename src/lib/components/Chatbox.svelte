@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher, onDestroy, onMount } from "svelte";
   import { commandInterpreter } from "../../assets/js/misc";
-  import { caller, dataChannel, messages } from "../../assets/js/store";
+  import { dataChannel, messages } from "../../assets/js/store";
   import ChatBubble from "./ChatBubble.svelte";
 
   let dispatch = createEventDispatcher();
