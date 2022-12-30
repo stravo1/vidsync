@@ -33,6 +33,7 @@
   }
   const setSubs = async () => {
     let url;
+    console.log(subsFile[0]);
     if (subsFile[0].type == "text/vtt") {
       url = URL.createObjectURL(subsFile[0]);
     } else if (subsFile[0].type == "application/x-subrip") {

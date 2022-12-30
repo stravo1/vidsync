@@ -1,5 +1,4 @@
 import {
-  caller,
   connected,
   dataChannel,
   messages,
@@ -10,18 +9,6 @@ import {
   time,
   user,
 } from "./store";
-import {
-  getFirestore,
-  addDoc,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  getDoc,
-  getDocs,
-  onSnapshot,
-  doc,
-  collection,
-} from "firebase/firestore";
 import { get } from "svelte/store";
 
 // Firebase configuration
@@ -55,10 +42,10 @@ const getTime = (time) => {
 
 const commandInterpreter = (command) => {
   /* all reg-ex */
-  var nameSet = /:name \w+/;
+  var nameSet = /:name .+/;
   var seek = /:seek \d+/;
-  var setVid = /:set-video \w+/;
-  var setSub = /:set-sub \w+/;
+  var setVid = /:set-video .+/;
+  var setSub = /:set-sub .+/;
 
   var text = "";
   switch (command) {
@@ -199,6 +186,7 @@ const registerChannelEventListeners = (channel, hangUp) => {
     setTimeout(hangUp, 1000);
   });
   channel.addEventListener("message", (event) => {
+    let $peerName = get(peerName);
     var seek = /:seek \d+.\d*/;
     console.log("Message received: " + event.data);
     if ($peerName != null) {
@@ -228,5 +216,5 @@ export {
   firebaseConfig,
   commandInterpreter,
   registerPeerConnectionListeners,
-  registerChannelEventListeners
+  registerChannelEventListeners,
 };

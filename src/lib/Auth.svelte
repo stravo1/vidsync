@@ -83,7 +83,7 @@
     background-color: black;
   }
   .card {
-    width: 45vw;
+    width: 40vw;
     height: 75vh;
     padding: 1.5rem 1rem;
     box-sizing: border-box;
@@ -91,7 +91,7 @@
     z-index: 10;
     color: wheat;
     margin: 10vh auto;
-    min-width: 280px;
+    min-width: 320px;
     border-radius: 1rem;
     display: flex;
     flex-direction: column;
