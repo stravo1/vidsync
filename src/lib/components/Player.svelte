@@ -33,10 +33,11 @@
   }
   const setSubs = async () => {
     let url;
-    console.log(subsFile[0]);
-    if (subsFile[0].type == "text/vtt") {
+    var vtt = /.*\.vtt$/;
+    var srt = /.*\.srt$/;
+    if (vtt.test(subsFile[0].name)) {
       url = URL.createObjectURL(subsFile[0]);
-    } else if (subsFile[0].type == "application/x-subrip") {
+    } else if (srt.test(subsFile[0].name)) {
       url = await toWebVTT(subsFile[0]);
     } else {
       alert("Unsupported file type :(");
