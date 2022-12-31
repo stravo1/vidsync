@@ -18,10 +18,10 @@
         {#if !$connected}
           <Waiting roomId={number} on:hangup />
         {:else}
-          <Chatbox on:hangup />
+          <Chatbox on:hangup on:hangup on:mute on:unmute />
         {/if}
       {:else}
-        <Chatbox on:hangup />
+        <Chatbox on:hangup on:mute on:unmute />
       {/if}
     {/await}
   </section>

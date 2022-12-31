@@ -139,7 +139,7 @@ const commandInterpreter = (command) => {
   ]);
 };
 
-const registerPeerConnectionListeners = (peerConnection) => {
+const registerPeerConnectionListeners = (peerConnection, audio) => {
   peerConnection.addEventListener("icegatheringstatechange", () => {
     console.log(
       `ICE gathering state changed: ${peerConnection.iceGatheringState}`
@@ -159,12 +159,18 @@ const registerPeerConnectionListeners = (peerConnection) => {
       `ICE connection state change: ${peerConnection.iceConnectionState}`
     );
   });
+  peerConnection.addEventListener("track", async (event) => {
+    console.log("Track added: ", event.streams);
+    const remoteStream = event.streams;
+    audio.srcObject = remoteStream[0];
+    audio.play()
+  });
+  // for use in chatbox to relay audio
 };
 
 const registerChannelEventListeners = (channel, hangUp) => {
   let $dataChannel = get(dataChannel);
   let $user = get(user);
-  let $peerName = get(peerName);
   channel.addEventListener("open", (event) => {
     console.log("Channel opened");
     connected.set(true);

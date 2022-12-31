@@ -40,6 +40,7 @@
   } from "./assets/js/store";
   import Auth from "./lib/Auth.svelte";
   import LoadingModal from "./lib/components/LoadingModal.svelte";
+  import { onMount } from "svelte";
 
   // ICE server configuration with Google's public STUN servers for WebRTC connection
   const configuration = {
@@ -80,6 +81,14 @@
   // unSubCall unsubscribes the listener listening to the changes in the `roomId` document (for answer and offer SDPs)
   // unSubIce unsubscribes the listener listening to the changes to the peer's ICE server list
 
+  let mic;
+  let sender;
+  let track;
+
+  onMount(() => {
+    mic = document.getElementById("mic");
+  });
+  // audio element for enabling audio comms
   const app = initializeApp(firebaseConfig);
   // Initialize Firebase
 
@@ -128,6 +137,18 @@
       }
     );
   }
+  async function setMic() {
+    const localStream = await navigator.mediaDevices.getUserMedia({
+      video: false,
+      audio: true,
+    });
+
+    localStream.getTracks().forEach((mediaTrack) => {
+      track = mediaTrack;
+      sender = peerConnection.addTrack(mediaTrack, localStream);
+      sender.replaceTrack(mediaTrack);
+    });
+  }
 
   /* function to create room */
   async function createRoom() {
@@ -145,6 +166,8 @@
     // took me a considerable amount time to figure that out... bitch...
     // have to set a demo channel so that ICE senpai gave me attention uwu
 
+    await setMic();
+
     const roomRef = doc(collection(db, "rooms"));
     // create a new doc on the collection db/rooms
     roomId = roomRef.id;
@@ -154,7 +177,7 @@
     remoteName = "callee";
 
     collectIceCandidates();
-    registerPeerConnectionListeners(peerConnection); // bitch 2
+    registerPeerConnectionListeners(peerConnection, mic); // bitch 2
 
     /* listen to creation of "main" channel (which the callee creates) */
     peerConnection.addEventListener("datachannel", (event) => {
@@ -230,11 +253,12 @@
 
       var channel = peerConnection.createDataChannel("main"); // bitch
       // create the "main" channel
+      await setMic();
       dataChannel.set(channel);
 
       registerChannelEventListeners(channel, hangUp);
       collectIceCandidates();
-      registerPeerConnectionListeners(peerConnection);
+      registerPeerConnectionListeners(peerConnection, mic);
       // blah blah blah
 
       const offer = roomSnapshot.data().offer;
@@ -280,13 +304,12 @@
       $dataChannel.send("bye bye");
       // if the callee is hanging up first then it sends a "bye bye" message
     } else {
-
       /* delete room from database */
       if (roomId) {
         const calleeCandidates = await getDocs(
           collection(db, "rooms", roomId, "callee")
         );
-        calleeCandidates.docs.forEach(async (candidate) => { 
+        calleeCandidates.docs.forEach(async (candidate) => {
           // delete all the callee's ICE candidate list
           await deleteDoc(candidate.ref);
         });
@@ -333,14 +356,35 @@
     roomId = e.detail.roomId;
     promise = joinRoomById(e.detail.roomId);
   };
+  const mute = () => {
+    track.stop();
+  };
+  const unmute = async () => {
+    const localStream = await navigator.mediaDevices.getUserMedia({
+      video: false,
+      audio: true,
+    });
+    localStream.getAudioTracks().forEach((audioTrack) => {
+      sender.replaceTrack(audioTrack);
+      track = audioTrack;
+    });
+  };
 </script>
 
 <TopPanel {auth} />
 <main class="background">
   <section>
     <Screen />
-    <Dashboard on:create={create} on:join={join} on:hangup={hangUp} {promise} />
+    <Dashboard
+      on:create={create}
+      on:join={join}
+      on:hangup={hangUp}
+      on:mute={mute}
+      on:unmute={unmute}
+      {promise}
+    />
   </section>
+  <audio id="mic" />
 </main>
 <Auth {auth} />
 <LoadingModal visible={hanging} />
