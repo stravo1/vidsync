@@ -1,11 +1,17 @@
 <script>
   import { signOut } from "firebase/auth";
-  import { loggedIn } from "../assets/js/store";
+  import { loggedIn, connected, waiting } from "../assets/js/store";
 
   $: visible = $loggedIn;
   export let auth;
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    if ($connected || $waiting) {
+      alert("Please hang-up before logging out :)");
+      return;
+    }
+    var x = await confirm("Log out?");
+    if (!x) return;
     signOut(auth)
       .then(() => {
         // Sign-out successful.

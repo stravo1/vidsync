@@ -70,43 +70,44 @@
       paused.set(true);
     }
   };
-  const handleSeek = (e) => {
-    handleOpacity();
-    time.set(e.target.value);
+  const trySeek = (timestamp) => {
+    time.set(timestamp);
     setTimeout(() => {
-      time.set(e.target.value);
+      time.set(timestamp);
     }, 100);
     setTimeout(() => {
-      time.set(e.target.value);
+      time.set(timestamp);
     }, 150);
     setTimeout(() => {
-      time.set(e.target.value);
+      time.set(timestamp);
     }, 200);
     setTimeout(() => {
-      time.set(e.target.value);
+      time.set(timestamp);
     }, 250);
     setTimeout(() => {
       console.log(getTime($time));
       $dataChannel.send(`:seek ${$time}`);
     }, 250);
   };
+  const handleSeek = (e) => {
+    handleOpacity();
+    trySeek(e.target.value);
+  };
   const handleForward = () => {
     handleOpacity();
     if ($time + 10 > $max) {
-      time.set($max - 5);
+      trySeek($max - 5);
       return;
     }
-    time.update((time) => time + 10);
-    $dataChannel.send(`:seek ${$time}`);
+    trySeek($time + 10);
   };
   const handleBackward = () => {
     handleOpacity();
     if ($time - 10 < 0) {
-      time.set(3);
+      trySeek(3);
       return;
     }
-    time.update((time) => time - 10);
-    $dataChannel.send(`:seek ${$time}`);
+    trySeek($time - 10);
   };
   const handleVolume = () => {
     handleOpacity();
