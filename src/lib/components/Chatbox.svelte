@@ -1,10 +1,7 @@
 <script>
   import { createEventDispatcher, onDestroy, onMount } from "svelte";
   import { commandInterpreter } from "../../assets/js/misc";
-  import {
-    dataChannel,
-    messages,
-  } from "../../assets/js/store";
+  import { dataChannel, messages } from "../../assets/js/store";
   import ChatBubble from "./ChatBubble.svelte";
 
   let dispatch = createEventDispatcher();
@@ -70,25 +67,29 @@
 <section class="wrapper">
   <section class="top on-surface-variant-text">
     <h3>messages</h3>
-    <div class="hangup">
-      <span
-        class="material-symbols-rounded"
-        on:click={handleMic}
-        on:keypress={handleMic}
-      >
-        {#if mute}
-          mic_off
-        {:else}
-          mic
-        {/if}
-      </span>
-      <span
-        class="material-symbols-rounded"
-        on:click={hangup}
-        on:keypress={hangup}
-      >
-        power_rounded
-      </span>
+    <div class="controls unselectable">
+      <div class="mic unselectable">
+        <span
+          class="material-symbols-rounded unselectable"
+          on:click={handleMic}
+          on:keypress={handleMic}
+        >
+          {#if mute}
+            mic_off
+          {:else}
+            mic
+          {/if}
+        </span>
+      </div>
+      <div class="hangup unselectable">
+        <span
+          class="material-symbols-rounded unselectable"
+          on:click={hangup}
+          on:keypress={hangup}
+        >
+          power_rounded
+        </span>
+      </div>
     </div>
   </section>
   <div class="box">
@@ -137,8 +138,10 @@
   h3 {
     margin: 0.5rem 0;
   }
-  .hangup {
+  .controls {
     cursor: pointer;
+    display: flex;
+    gap: 0.75rem;
   }
   .box {
     flex-basis: 90%;
