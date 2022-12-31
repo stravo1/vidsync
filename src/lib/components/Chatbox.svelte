@@ -67,8 +67,8 @@
 <section class="wrapper">
   <section class="top on-surface-variant-text">
     <h3>messages</h3>
-    <div class="controls unselectable">
-      <div class="mic unselectable">
+    <div class="controls">
+      <div class="mic">
         <span
           class="material-symbols-rounded unselectable"
           on:click={handleMic}
@@ -81,7 +81,7 @@
           {/if}
         </span>
       </div>
-      <div class="hangup unselectable">
+      <div class="hangup">
         <span
           class="material-symbols-rounded unselectable"
           on:click={hangup}
@@ -139,9 +139,12 @@
     margin: 0.5rem 0;
   }
   .controls {
-    cursor: pointer;
     display: flex;
     gap: 0.75rem;
+  }
+  .hangup,
+  .mic {
+    cursor: pointer;
   }
   .box {
     flex-basis: 90%;
