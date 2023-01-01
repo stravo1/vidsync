@@ -16,6 +16,15 @@
 
     dispatch("hangup");
   };
+  const copyConfirm = () => {
+    let original = roomId;
+    setTimeout(() => {
+      roomId = "copied!";
+    }, 100);
+    setTimeout(() => {
+      roomId = original;
+    }, 1100);
+  };
 </script>
 
 <div class="wrapper">
@@ -34,8 +43,9 @@
       <button
         data-clipboard-text={roomId}
         class="roomIdButton surface-variant on-surface-variant-text"
+        on:click={copyConfirm}
       >
-        <span class="material-symbols-rounded "> copy_all </span>
+        <span class="material-symbols-rounded"> copy_all </span>
       </button>
     </section>
     <button on:click={hangup} class="center error on-error-text">
@@ -98,5 +108,8 @@
     transition: all;
     transition-duration: 150ms;
     transition-timing-function: ease-in-out;
+  }
+  .material-symbols-rounded {
+    font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 200, "opsz" 48;
   }
 </style>
