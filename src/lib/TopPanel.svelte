@@ -25,7 +25,7 @@
 <header class="background on-background-text">
   <h1>vidsync</h1>
   <section>
-    <span class="material-symbols-rounded"> help </span>
+    <a href="https://github.com/stravo1/vidsync" target="_blank" rel="noreferrer"><span class="material-symbols-rounded"> code </span></a> 
     <span
       on:click={handleSignOut}
       on:keydown={handleSignOut}
