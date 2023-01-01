@@ -23,7 +23,7 @@
     }, 100);
     setTimeout(() => {
       roomId = original;
-    }, 1100);
+    }, 600);
   };
 </script>
 
@@ -87,6 +87,9 @@
   .roomId {
     flex-basis: 90%;
     padding: 0.5rem 0.25rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
   .roomIdButton {
     width: 2rem;
@@ -111,5 +114,8 @@
   }
   .material-symbols-rounded {
     font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 200, "opsz" 48;
+  }
+  .roomId:hover{
+    overflow: scroll;
   }
 </style>

@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher, onDestroy, onMount } from "svelte";
   import { commandInterpreter } from "../../assets/js/misc";
-  import { dataChannel, messages } from "../../assets/js/store";
+  import { dataChannel, messages, micPermissions } from "../../assets/js/store";
   import ChatBubble from "./ChatBubble.svelte";
 
   let dispatch = createEventDispatcher();
@@ -68,19 +68,21 @@
   <section class="top on-surface-variant-text">
     <h3>messages</h3>
     <div class="controls">
-      <div class="mic">
-        <span
-          class="material-symbols-rounded unselectable"
-          on:click={handleMic}
-          on:keypress={handleMic}
-        >
-          {#if mute}
-            mic_off
-          {:else}
-            mic
-          {/if}
-        </span>
-      </div>
+      {#if $micPermissions}
+        <div class="mic">
+          <span
+            class="material-symbols-rounded unselectable"
+            on:click={handleMic}
+            on:keypress={handleMic}
+          >
+            {#if mute}
+              mic_off
+            {:else}
+              mic
+            {/if}
+          </span>
+        </div>
+      {/if}
       <div class="hangup">
         <span
           class="material-symbols-rounded unselectable"

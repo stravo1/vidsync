@@ -2,6 +2,7 @@ import {
   connected,
   dataChannel,
   messages,
+  micPermissions,
   name,
   paused,
   peerName,
@@ -57,13 +58,9 @@ const commandInterpreter = (command) => {
       paused.set(true);
       text = "pausing video";
       break;
-    case ":help":
-      text = `
-      :pause => pause video \n
-      :play => play video \n
-      :seek n => seek to nth second \n
-      :name n => set your username to n for this session \n
-      `;
+    case ":mic false":
+      micPermissions.set(false);
+      text = "peer did not provide mic permission. calls are disabled :(";
       break;
     default:
       if (seek.test(command)) {
@@ -126,7 +123,7 @@ const commandInterpreter = (command) => {
         break;
       }
 
-      text = "oops! try again \n use :help to get list of all commands";
+      text = "oops! try again";
   }
   messages.update((arr) => [
     ...arr,
@@ -160,21 +157,25 @@ const registerPeerConnectionListeners = (peerConnection, audio) => {
     );
   });
   peerConnection.addEventListener("track", async (event) => {
+    let $micPermissions = get(micPermissions);
+    if (!$micPermissions) return;
     console.log("Track added: ", event.streams);
     const remoteStream = event.streams;
     audio.srcObject = remoteStream[0];
-    audio.play()
+    audio.play();
   });
   // for use in chatbox to relay audio
 };
 
 const registerChannelEventListeners = (channel, hangUp) => {
   let $dataChannel = get(dataChannel);
+  let $micPermissions = get(micPermissions);
   let $user = get(user);
   channel.addEventListener("open", (event) => {
     console.log("Channel opened");
     connected.set(true);
     $dataChannel.send(`:name ${$user.displayName}`); // exchange each other's names
+    if (!$micPermissions) $dataChannel.send(":mic false");
   });
 
   // Disable input when closed

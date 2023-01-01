@@ -1,9 +1,10 @@
 import { writable } from "svelte/store";
-/* auth */
+/* auth n permissions */
 export const loggedIn = writable(false);
 export const loaded = writable(false);
 export const authObj = writable(null);
 export const user = writable(null);
+export const micPermissions = writable(true);
 
 /* room n connection */
 export const creating = writable(false);

@@ -34,6 +34,7 @@
     loaded,
     loggedIn,
     messages,
+    micPermissions,
     peerName,
     user,
     waiting,
@@ -127,27 +128,42 @@
       collection(db, "rooms", roomId, remoteName),
       (snapshot) => {
         snapshot.docChanges().forEach((change) => {
-          if (change.type === "added") {
+          if (
+            change.type === "added" &&
+            peerConnection.remoteDescription != null && // for un-deleted ICE candidates which might have remained in the database
+            peerConnection.localDescription != null // until SDPs are set, don't accpet these ICE candidates, after SDPs are set, fresh candidates are updated
+          ) {
             // if new candidate has been added then
-            console.log("adding ice ;)");
             const candidate = new RTCIceCandidate(change.doc.data());
-            peerConnection.addIceCandidate(candidate); // add peer's ICE candidates after fetching them from database
+
+            peerConnection
+              .addIceCandidate(candidate)
+              .then(() => console.log("adding ice ;)"))
+              .catch(() => console.log("Error adding ICE candidates."));
+            // add peer's ICE candidates after fetching them from database
           }
         });
       }
     );
   }
-  async function setMic() {
-    const localStream = await navigator.mediaDevices.getUserMedia({
-      video: false,
-      audio: true,
-    });
+  async function setMic(fresh = false) {
+    try {
+      const localStream = await navigator.mediaDevices.getUserMedia({
+        video: false,
+        audio: true,
+      });
 
-    localStream.getTracks().forEach((mediaTrack) => {
-      track = mediaTrack;
-      sender = peerConnection.addTrack(mediaTrack, localStream);
-      sender.replaceTrack(mediaTrack);
-    });
+      localStream.getAudioTracks().forEach((audioTrack) => {
+        if (fresh) sender = peerConnection.addTrack(audioTrack, localStream);
+        sender.replaceTrack(audioTrack);
+        track = audioTrack;
+      });
+      micPermissions.set(true);
+    } catch (err) {
+      console.log("Couldn't get permissions");
+      alert("Premission denied :(\nCalls won't work.");
+      micPermissions.set(false);
+    }
   }
 
   /* function to create room */
@@ -166,13 +182,12 @@
     // took me a considerable amount time to figure that out... bitch...
     // have to set a demo channel so that ICE senpai gave me attention uwu
 
-    await setMic();
+    await setMic(true);
 
-    const roomRef = doc(collection(db, "rooms"));
-    // create a new doc on the collection db/rooms
-    roomId = roomRef.id;
-    // the id is immediately avialable but is returned only after it has been actualy created on the backend
-
+    roomId = $user.uid;
+    // setting roomId as the user.uid to make sure there's only a single room on the database per user no matter what
+    // even if a user reloads the page without hanging up still the next time that user will rewrite the previous room (although might cause few errors)
+    // no storage wasted
     localName = "caller";
     remoteName = "callee";
 
@@ -208,7 +223,7 @@
       },
     };
 
-    await setDoc(roomRef, roomWithOffer);
+    await setDoc(doc(db, "rooms", $user.uid), roomWithOffer);
     // create the room in database
 
     /* Listening for remote peer's answer SDP below */
@@ -253,7 +268,7 @@
 
       var channel = peerConnection.createDataChannel("main"); // bitch
       // create the "main" channel
-      await setMic();
+      await setMic(true);
       dataChannel.set(channel);
 
       registerChannelEventListeners(channel, hangUp);
@@ -357,17 +372,12 @@
     promise = joinRoomById(e.detail.roomId);
   };
   const mute = () => {
-    track.stop();
+    if (track) {
+      track.stop();
+    }
   };
   const unmute = async () => {
-    const localStream = await navigator.mediaDevices.getUserMedia({
-      video: false,
-      audio: true,
-    });
-    localStream.getAudioTracks().forEach((audioTrack) => {
-      sender.replaceTrack(audioTrack);
-      track = audioTrack;
-    });
+    await setMic();
   };
 </script>
 
