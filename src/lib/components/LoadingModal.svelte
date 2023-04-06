@@ -6,8 +6,11 @@
 
 <div class="modal" class:visible />
 <div class="wrapper" class:visible>
-  <div class="center loadingCard primary-container-dark on-primary-container-text-dark" class:visible>
-    <Spinner /> Loading...
+  <div
+    class="center loadingCard primary-container-dark on-primary-container-text-dark"
+    class:visible
+  >
+    <Spinner /> &ensp; Loading...
   </div>
 </div>
 
@@ -40,5 +43,8 @@
   }
   .visible {
     display: block !important;
+  }
+  .center {
+    gap: 1rem;
   }
 </style>

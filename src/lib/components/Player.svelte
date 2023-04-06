@@ -293,6 +293,7 @@
     background-color: rgb(16, 8, 8);
     border-radius: 1rem;
     margin: 2rem;
+    max-height: 80vh;
   }
   .controls {
     position: absolute;
@@ -391,5 +392,10 @@
     -webkit-transform: translateY(-5%) !important;
     transform: translateY(-5%) !important;
     position: relative;
+  }
+  @media screen and (max-width: 720px) {
+    .player {
+      max-height: 90vh;
+    }
   }
 </style>

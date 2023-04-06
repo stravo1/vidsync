@@ -1,3 +1,7 @@
+<script>
+  export let dark = false;
+</script>
+
 <svg
   class="spinner"
   width="18px"
@@ -7,6 +11,7 @@
 >
   <circle
     class="path"
+    style={dark ? "stroke: rgb(48, 42, 42)" : ""}
     fill="none"
     stroke-width="6"
     stroke-linecap="round"

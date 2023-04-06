@@ -1,5 +1,6 @@
 <script>
   import { chatOpen, connected } from "../assets/js/store";
+  import TopPanel from "./TopPanel.svelte";
   import Chatbox from "./components/Chatbox.svelte";
   import Room from "./components/Room.svelte";
   import Waiting from "./components/Waiting.svelte";
@@ -49,11 +50,12 @@
     border-radius: 0.5rem;
   }
   @media screen and (max-width: 720px) {
-    .card {
-      width: 100%;
-      height: 58vh;
-      box-sizing: border-box;
-      margin: 1rem 0;
+    .wrapper {
+      width: 100vw;
+    }
+    .content {
+      width: 100vw;
+      height: 100vh;
     }
   }
 </style>

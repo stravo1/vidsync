@@ -1,7 +1,7 @@
 <script>
   import { onDestroy, onMount } from "svelte";
   import { commandInterpreter } from "../../assets/js/misc";
-  import { dataChannel, messages } from "../../assets/js/store";
+  import { chatOpen, dataChannel, messages } from "../../assets/js/store";
   import ChatBubble from "./ChatBubble.svelte";
 
   let box;
@@ -38,6 +38,13 @@
     }
   });
   onDestroy(unsub);
+  const scroll = () => {
+    var main = document.getElementsByTagName("main")[0];
+    main.scrollTop = 0;
+    setTimeout(() => {
+      chatOpen.set(true);
+    }, 500);
+  };
 </script>
 
 <section class="wrapper">
@@ -73,6 +80,12 @@
       <span class="material-symbols-rounded"> send </span>
     </button>
   </div>
+  <button
+    class="primary-dark on-secondary-text-dark goback-small center"
+    on:click={scroll}
+  >
+    ← view player
+  </button>
 </section>
 
 <style>
@@ -92,6 +105,20 @@
     align-items: center;
     margin: 1rem 0;
   }
+  .goback-small {
+    display: none;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.75rem;
+    margin: 1rem 0;
+    gap: 0.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-size: 24px;
+    font-family: "Space Grotesk", monospace;
+    font-weight: bold;
+    cursor: pointer;
+  }
   h2 {
     font-size: 30px;
     margin: 0;
@@ -107,11 +134,7 @@
     margin: 1rem 0;
     scroll-behavior: smooth;
   }
-  .input {
-    display: flex;
-    gap: 0.25rem;
-    margin-bottom: 1.5rem;
-  }
+
   input {
     width: 100%;
     box-sizing: border-box;
@@ -137,5 +160,44 @@
     transition: all;
     transition-duration: 150ms;
     transition-timing-function: ease-in-out;
+  }
+  input:focus {
+    outline: none;
+  }
+  @media screen and (max-width: 720px) {
+    .wrapper {
+      max-width: unset;
+      width: 100%;
+      margin: 0;
+    }
+
+    h2 {
+      font-size: 24px;
+      margin-left: 3rem;
+      color: var(--md-sys-color-primary);
+    }
+    .box {
+      margin-left: 2rem;
+    }
+    .goback-small {
+      display: block;
+      font-weight: 500;
+      text-align: right;
+      margin-bottom: 1rem;
+    }
+    input {
+      border-radius: 0;
+      padding: 1rem;
+      padding-left: 2.5rem;
+    }
+    .input {
+      display: flex;
+      gap: 0rem;
+      margin-bottom: 2rem;
+    }
+    .send {
+      border-radius: 0;
+      margin: 0;
+    }
   }
 </style>

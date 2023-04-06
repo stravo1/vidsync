@@ -44,9 +44,16 @@
         console.error(errorCode, errorMessage);
       });
   };
+  const scroll = () => {
+    var main = document.getElementsByTagName("main")[0];
+    main.scrollTop = 0;
+  };
 </script>
 
 <div class={!loading ? "wrapper primary-dark" : "loading"}>
+  <div on:click={scroll} on:keypress={scroll} class="scroll primary-text">
+    ↑
+  </div>
   <div class="contain" class:loading>
     <div class="image center">
       <img src={image} alt="log in" />
@@ -63,7 +70,6 @@
 <LoadingModal visible={loading} />
 
 <style>
-
   .loading {
     display: none !important;
   }
@@ -99,12 +105,21 @@
     text-decoration-thickness: 0.25rem;
   }
   @media screen and (max-width: 720px) {
-    img {
-      height: 100%;
-      scale: 1;
+    .wrapper {
+      width: 100vw;
+      height: 100vh;
     }
-    .title {
-      font-size: smaller;
+    .scroll {
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 50%;
+      font-size: 40px;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+    .scroll:hover {
+      cursor: pointer;
     }
   }
 </style>

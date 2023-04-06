@@ -414,8 +414,13 @@
     box-sizing: border-box;
   }
   @media screen and (max-width: 720px) {
+    main {
+      overflow-y: hidden;
+      scroll-behavior: smooth;
+    }
     section {
       flex-direction: column;
+      height: unset;
     }
   }
 </style>

@@ -2,9 +2,12 @@
   import { signOut } from "firebase/auth";
   import { loggedIn, connected, waiting, authObj } from "../assets/js/store";
 
-  $: visible = $loggedIn;
-
   const handleSignOut = async () => {
+    if (!on_primary) {
+      var main = document.getElementsByTagName("main")[0];
+      main.scrollTop = 0;
+      return;
+    }
     if ($connected || $waiting) {
       alert("Please hang-up before logging out :)");
       return;
@@ -24,7 +27,9 @@
 </script>
 
 <header
-  class={on_primary ? "primary on-primary-text" : "primary-dark primary-text"}
+  class={on_primary
+    ? "primary on-primary-text"
+    : "primary-dark primary-text small"}
 >
   <h1 on:click={handleSignOut} on:keydown={handleSignOut}>vidsync</h1>
   <!-- <section>
@@ -56,17 +61,19 @@
     font-size: 30px;
   }
 
-  /* section {
-    display: flex;
-    gap: 0 2rem;
-  }
-  .material-symbols-rounded {
-    cursor: pointer;
-  }
-  .logOut {
+  .small {
     display: none;
   }
-  .visible {
-    display: block !important;
-  } */
+  @media screen and (max-width: 720px) {
+    h1 {
+      font-size: 24px;
+      margin-top: 1.25rem;
+    }
+    .small {
+      display: flex;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
 </style>

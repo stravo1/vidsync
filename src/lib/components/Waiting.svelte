@@ -3,6 +3,7 @@
   import { onMount } from "svelte";
   import connect from "../../assets/images/doggy.gif";
   import ClipboardJS from "clipboard/dist/clipboard.min.js";
+  import TopPanel from "../TopPanel.svelte";
 
   let dispatch = createEventDispatcher();
   export let roomId;
@@ -28,12 +29,16 @@
 </script>
 
 <div class="wrapper">
+  <TopPanel on_primary={false} />
   <div class="center">
     <img src={connect} alt=":)" />
   </div>
   <section class="on-primary-text-dark info">
-    <h2>waiting...</h2>
-    here's your room id:
+    <h2>
+      waiting
+      <span class="big">...</span><span class="small">→</span>
+    </h2>
+    <span class="big">here's your room id:</span>
     <section
       id="copy"
       data-clipboard-text={roomId}
@@ -52,9 +57,15 @@
     </section>
     <button
       on:click={hangup}
-      class="center error-container-dark on-error-container-text-dark"
+      class="center hangup error-container-dark on-error-container-text-dark"
     >
       hang up
+    </button>
+    <button
+      class="primary-dark on-secondary-text-dark hangup-small center"
+      on:click={hangup}
+    >
+      ← hang up
     </button>
   </section>
 </div>
@@ -130,5 +141,51 @@
   }
   .roomId:hover {
     overflow: scroll;
+  }
+  .small {
+    display: none;
+  }
+  @media screen and (max-width: 720px) {
+    .wrapper {
+      max-width: unset;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: end;
+      margin: 0;
+    }
+    .small {
+      display: inline;
+    }
+    .big {
+      display: none;
+    }
+    .info {
+      margin: 0;
+    }
+    h2 {
+      font-size: 40px;
+      color: var(--md-sys-color-primary);
+      margin-left: 2.5rem;
+    }
+    img {
+      max-width: 250px;
+      margin-bottom: 3rem;
+    }
+    .roomIdHolder {
+      border: none;
+      border-radius: 0;
+      padding-left: 2.5rem;
+      margin: 1rem 0 3rem 0;
+    }
+    .hangup {
+      display: none;
+    }
+    .hangup-small {
+      display: block;
+      font-weight: 500;
+      text-align: right;
+      margin-bottom: 1rem;
+    }
   }
 </style>

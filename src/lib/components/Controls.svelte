@@ -29,6 +29,10 @@
   };
   const setChat = () => {
     chatOpen.set(!$chatOpen);
+    var main = document.getElementsByTagName("main")[0];
+    setTimeout(() => {
+      main.scrollTop = main.scrollHeight;
+    }, 100);
   };
 </script>
 
@@ -64,7 +68,13 @@
     on:click={setChat}
     on:keypress={setChat}
   >
-    <span class={!$chatOpen ? "material-symbols-rounded on-primary-container-text-dark" : "material-symbols-rounded primary-text"}> message</span>
+    <span
+      class={!$chatOpen
+        ? "material-symbols-rounded on-primary-container-text-dark"
+        : "material-symbols-rounded primary-text"}
+    >
+      message</span
+    >
   </div>
 </div>
 
@@ -97,5 +107,10 @@
   .button > span {
     font-size: 28px;
     display: block;
+  }
+  @media screen and (max-width: 720px) {
+    .button {
+      opacity: 1 !important;
+    }
   }
 </style>

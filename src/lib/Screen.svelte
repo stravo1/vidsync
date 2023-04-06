@@ -24,6 +24,10 @@
     }
     document.getElementById("fileSelector").click();
   };
+  const scroll = () => {
+    var main = document.getElementsByTagName("main")[0];
+    main.scrollTop = main.scrollHeight;
+  };
 </script>
 
 <div class="screen primary">
@@ -57,6 +61,13 @@
       <Controls on:hangup on:mute on:unmute />
     {:else}
       <Info />
+      <div
+        on:click={scroll}
+        on:keypress={scroll}
+        class="scroll on-primary-text"
+      >
+        ↓
+      </div>
     {/if}
   </div>
 </div>
@@ -98,11 +109,24 @@
     font-size: 48px;
     font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 48;
   }
+  .scroll {
+    display: none;
+  }
   @media screen and (max-width: 720px) {
-    .wrapper {
-      width: 100%;
-      box-sizing: border-box;
-      margin: 1rem 0;
+    .screen {
+      height: 100vh;
+    }
+    .scroll {
+      display: block;
+      position: absolute;
+      bottom: 3%;
+      right: 50%;
+      font-size: 40px;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+    .scroll:hover {
+      cursor: pointer;
     }
   }
 </style>
