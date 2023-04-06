@@ -6,11 +6,10 @@
 </script>
 
 <div class="wrapper">
-  <div class:help class:received>
+  <div class="primary on-primary-text" class:help class:received>
     <span class="name">
       {name}
     </span>
-    <br />
     <span class="message">{message}</span>
   </div>
 </div>
@@ -19,31 +18,44 @@
   .wrapper {
     width: 90%;
     box-sizing: border-box;
-    margin: 1rem 0.25rem;
+    margin: 1.5rem 0.25rem;
     overflow-x: scroll;
     border-radius: 0.25rem;
   }
   .wrapper > div {
-    background-color: #e5bdc2;
-    color: #660026;
+    /* background-color: #BC004C;
+    color: #ffecf3; */
+    font-weight: bold;
     padding: 0.5rem;
     width: fit-content;
     border-radius: 0.25rem;
     opacity: 0.9;
+    min-width: 50px;
   }
   .received {
-    background-color: #ebbf90 !important;
-    color: #452b08 !important;
+    background-color: #FF4E7D !important;
+    color: #661f32 !important;
+  }
+  /* .received > .name {
+    color: #492231;
   }
   .help {
-    background-color: #ffdad6 !important;
-    color: #93000a !important;
+    background-color: #ECE0E0 !important;
+    color: #816d6d !important;
+  }
+  .help > .name {
+    color: rgb(68, 68, 68);
+  } */
+  span {
+    display: block;
   }
   .name {
     font-size: 12px;
-    opacity: 0.7;
+    font-weight: 500;
   }
   .message {
-    font-size: 14px;
+    font-size: 16px;
+    margin-top: 0.5rem;
+    margin-bottom: 0.25rem;
   }
 </style>

@@ -1,9 +1,8 @@
 <script>
   import { signOut } from "firebase/auth";
-  import { loggedIn, connected, waiting } from "../assets/js/store";
+  import { loggedIn, connected, waiting, authObj } from "../assets/js/store";
 
   $: visible = $loggedIn;
-  export let auth;
 
   const handleSignOut = async () => {
     if ($connected || $waiting) {
@@ -12,7 +11,7 @@
     }
     var x = await confirm("Log out?");
     if (!x) return;
-    signOut(auth)
+    signOut($authObj)
       .then(() => {
         // Sign-out successful.
       })
@@ -20,12 +19,20 @@
         // An error happened.
       });
   };
+
+  export let on_primary = true;
 </script>
 
-<header class="background on-background-text">
-  <h1>vidsync</h1>
-  <section>
-    <a href="https://github.com/stravo1/vidsync" target="_blank" rel="noreferrer"><span class="material-symbols-rounded"> code </span></a> 
+<header
+  class={on_primary ? "primary on-primary-text" : "primary-dark primary-text"}
+>
+  <h1 on:click={handleSignOut} on:keydown={handleSignOut}>vidsync</h1>
+  <!-- <section>
+    <a
+      href="https://github.com/stravo1/vidsync"
+      target="_blank"
+      rel="noreferrer"><span class="material-symbols-rounded"> code </span></a
+    >
     <span
       on:click={handleSignOut}
       on:keydown={handleSignOut}
@@ -34,18 +41,22 @@
     >
       logout
     </span>
-  </section>
+  </section> -->
 </header>
 
 <style>
   header {
-    height: 10%;
     display: flex;
-    padding: 0 2rem;
-    justify-content: space-between;
-    align-items: center;
+    padding: 0 3rem;
+    height: 10%;
+    /* justify-content: space-between;
+    align-items: center; */
   }
-  section {
+  h1 {
+    font-size: 30px;
+  }
+
+  /* section {
     display: flex;
     gap: 0 2rem;
   }
@@ -57,5 +68,5 @@
   }
   .visible {
     display: block !important;
-  }
+  } */
 </style>

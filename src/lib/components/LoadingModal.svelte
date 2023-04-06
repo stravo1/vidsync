@@ -6,19 +6,21 @@
 
 <div class="modal" class:visible />
 <div class="wrapper" class:visible>
-    <div class="center loadingCard secondary on-secondary-text" class:visible>
-        <Spinner /> Loading...
-      </div>
+  <div class="center loadingCard primary-container-dark on-primary-container-text-dark" class:visible>
+    <Spinner /> Loading...
+  </div>
 </div>
 
 <style>
-  .wrapper, .modal {
+  .wrapper,
+  .modal {
     display: none;
     position: fixed;
     width: 100vw;
     height: 100vh;
     box-sizing: border-box;
     top: 0;
+    z-index: 1000;
   }
   .modal {
     opacity: 0.7;
@@ -34,6 +36,7 @@
     padding: 2.5rem;
     box-sizing: border-box;
     border-radius: 1rem;
+    font-weight: bold;
   }
   .visible {
     display: block !important;

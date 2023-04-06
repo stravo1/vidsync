@@ -26,6 +26,7 @@
   import {
     authObj,
     caller,
+    chatOpen,
     connected,
     creating,
     dataChannel,
@@ -354,6 +355,7 @@
     joining.set(false);
     dataChannel.set(null);
     peerName.set(null);
+    chatOpen.set(false);
     promise = new Promise(() => {});
     // reset all store values
     setTimeout(() => {
@@ -381,33 +383,31 @@
   };
 </script>
 
-<TopPanel {auth} />
 <main class="background">
   <section>
-    <Screen />
-    <Dashboard
-      on:create={create}
-      on:join={join}
-      on:hangup={hangUp}
-      on:mute={mute}
-      on:unmute={unmute}
-      {promise}
-    />
+    <Screen on:hangup={hangUp} on:mute={mute} on:unmute={unmute} />
+    {#if !$loggedIn}
+      <Auth {auth} />
+    {:else}
+      <Dashboard
+        on:create={create}
+        on:join={join}
+        on:hangup={hangUp}
+        {promise}
+      />
+    {/if}
   </section>
   <audio id="mic" />
 </main>
-<Auth {auth} />
 <LoadingModal visible={hanging} />
 
 <style>
   main {
     box-sizing: border-box;
-    height: 90%;
-    overflow-y: auto;
-    padding: 1rem;
+    /*overflow-y: auto;*/
+    height: 100vh;
   }
   section {
-    padding: 1rem 1.5rem;
     display: flex;
     justify-content: center;
     height: 100%;

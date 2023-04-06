@@ -289,9 +289,10 @@
   .player {
     display: flex;
     position: relative;
-    height: 100%;
+    box-sizing: border-box;
     background-color: rgb(16, 8, 8);
     border-radius: 1rem;
+    margin: 2rem;
   }
   .controls {
     position: absolute;

@@ -42,7 +42,7 @@
   .path {
     stroke-dasharray: 187;
     stroke-dashoffset: 0;
-    stroke: #201a1b;
+    stroke: #ffffff;
     transform-origin: center;
     -webkit-animation: dash 1.4s ease-in-out infinite;
     animation: dash 1.4s ease-in-out infinite;

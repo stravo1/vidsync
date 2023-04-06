@@ -1,5 +1,5 @@
 <script>
-  import image from "../assets/images/31.svg";
+  import image from "../assets/images/unboxing.png";
   import {
     browserLocalPersistence,
     GoogleAuthProvider,
@@ -10,7 +10,7 @@
   import LoadingModal from "./components/LoadingModal.svelte";
 
   export let auth;
-  $: invisible = $loggedIn;
+
   $: loading = !$loaded;
 
   const provider = new GoogleAuthProvider();
@@ -46,89 +46,57 @@
   };
 </script>
 
-<div class="modal" class:invisible />
-<div class="wrapper" class:invisible>
-  <div class="card secondary-container" class:loading>
+<div class={!loading ? "wrapper primary-dark" : "loading"}>
+  <div class="contain" class:loading>
     <div class="image center">
       <img src={image} alt="log in" />
     </div>
-    <div class="title on-secondary-container-text">
-      <h2>welcome!</h2>
-      looks like you're not signed in...
-    </div>
-    <button on:click={hadnleSignIn} class="google on-secondary-container"
-      >Sign in with Google</button
+    <div
+      class="title primary-text"
+      on:click={hadnleSignIn}
+      on:keypress={hadnleSignIn}
     >
+      Continue with Google →
+    </div>
   </div>
 </div>
 <LoadingModal visible={loading} />
 
 <style>
-  .invisible {
-    display: none;
-  }
+
   .loading {
     display: none !important;
   }
-  .wrapper,
-  .modal {
-    position: fixed;
-    width: 100vw;
-    height: 100vh;
-    box-sizing: border-box;
-    top: 0;
+  .contain {
+    margin: 2rem;
   }
-  .modal {
-    opacity: 0.8;
-    background-color: black;
-  }
-  .card {
+  .wrapper {
     width: 40vw;
-    height: 75vh;
-    padding: 1.5rem 1rem;
-    box-sizing: border-box;
-    opacity: 1;
-    z-index: 10;
-    color: wheat;
-    margin: 10vh auto;
-    min-width: 320px;
-    border-radius: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    justify-content: center;
+    text-align: center;
   }
   .image {
-    flex-basis: 70%;
-    width: 100%;
+    margin: 3rem;
+    margin-bottom: 1.5rem;
     overflow: hidden;
   }
   img {
     width: 100%;
-    scale: 1.25;
+    max-width: 250px;
     object-fit: cover;
   }
   .title {
-    flex-basis: 15%;
+    font-size: 30px;
+    font-weight: bold;
     text-align: center;
     margin: 1rem 0;
   }
-  button {
-    padding: 0.5rem;
-    gap: 0.5rem;
-    font-size: medium;
-    border-radius: 0.5rem;
-    border: none;
-    font-family: "Martian Mono", monospace;
+  .title:hover {
     cursor: pointer;
-    transition: all;
-    transition-duration: 150ms;
-    transition-timing-function: ease-in-out;
-  }
-  button:hover {
-    filter: drop-shadow(5px 10px 5px rgba(0, 0, 0, 0.25));
-  }
-  .google {
-    flex-basis: 15%;
+    text-decoration: underline;
+    text-decoration-thickness: 0.25rem;
   }
   @media screen and (max-width: 720px) {
     img {

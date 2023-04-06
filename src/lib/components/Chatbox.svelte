@@ -1,22 +1,12 @@
 <script>
-  import { createEventDispatcher, onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { commandInterpreter } from "../../assets/js/misc";
-  import { dataChannel, messages, micPermissions } from "../../assets/js/store";
+  import { dataChannel, messages } from "../../assets/js/store";
   import ChatBubble from "./ChatBubble.svelte";
 
-  let dispatch = createEventDispatcher();
   let box;
   let text;
-  let mute = false;
 
-  const handleMic = () => {
-    if (mute) {
-      dispatch("unmute");
-    } else {
-      dispatch("mute");
-    }
-    mute = !mute;
-  };
   onMount(() => {
     box = document.getElementsByClassName("box")[0];
   });
@@ -40,20 +30,6 @@
     text = "";
   };
 
-  const hangup = () => {
-    var sure = confirm("Leave room?");
-    if (!sure) return;
-    messages.update((arr) => [
-      ...arr,
-      {
-        name: "@system",
-        message: "hanging up, please wait...",
-        received: false,
-        help: true,
-      },
-    ]);
-    dispatch("hangup");
-  };
   const unsub = messages.subscribe((val) => {
     if (box != undefined) {
       setTimeout(() => {
@@ -65,34 +41,8 @@
 </script>
 
 <section class="wrapper">
-  <section class="top on-surface-variant-text">
-    <h3>messages</h3>
-    <div class="controls">
-      {#if $micPermissions}
-        <div class="mic">
-          <span
-            class="material-symbols-rounded unselectable"
-            on:click={handleMic}
-            on:keypress={handleMic}
-          >
-            {#if mute}
-              mic_off
-            {:else}
-              mic
-            {/if}
-          </span>
-        </div>
-      {/if}
-      <div class="hangup">
-        <span
-          class="material-symbols-rounded unselectable"
-          on:click={hangup}
-          on:keypress={hangup}
-        >
-          power_rounded
-        </span>
-      </div>
-    </div>
+  <section class="top on-primary-text-dark">
+    <h2>messages</h2>
   </section>
   <div class="box">
     {#each $messages as message}
@@ -113,10 +63,13 @@
         }
       }}
       type="text"
-      class="on-surface-variant"
+      class="on-primary-container-dark"
       placeholder="enter message"
     />
-    <button class="send center error on-error-text" on:click={sendMessage}>
+    <button
+      class="send center on-primary-container-dark primary-text"
+      on:click={sendMessage}
+    >
       <span class="material-symbols-rounded"> send </span>
     </button>
   </div>
@@ -127,8 +80,9 @@
     display: flex;
     flex-direction: column;
     min-height: 350px;
+    max-width: 375px;
     height: 100%;
-    width: 100%;
+    width: 90%;
   }
   .top {
     flex-basis: 5%;
@@ -136,17 +90,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin: 1rem 0;
   }
-  h3 {
-    margin: 0.5rem 0;
-  }
-  .controls {
-    display: flex;
-    gap: 0.75rem;
-  }
-  .hangup,
-  .mic {
-    cursor: pointer;
+  h2 {
+    font-size: 30px;
+    margin: 0;
+    margin-bottom: 0.5rem;
   }
   .box {
     flex-basis: 90%;
@@ -161,23 +110,27 @@
   .input {
     display: flex;
     gap: 0.25rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
   }
   input {
     width: 100%;
     box-sizing: border-box;
-    padding: 0.65rem;
-    border-radius: 0.25rem;
+    padding: 0.75rem;
+    border-radius: 10px;
     border: none;
-    font-family: "Martian Mono", monospace;
+    font-family: "Space Grotesk", monospace;
+    font-weight: bold;
+    font-size: 16px;
+    color: #660026;
   }
   input::placeholder {
-    font-family: "Martian Mono", monospace;
+    font-family: "Space Grotesk", monospace;
   }
   .send {
-    padding: 0.25rem 0.5rem;
+    padding: 0.75rem;
     font-size: large;
-    border-radius: 0.25rem;
+    border-radius: 10px;
+    margin-left: 0.75rem;
     border: none;
     font-family: "Martian Mono", monospace;
     cursor: pointer;
