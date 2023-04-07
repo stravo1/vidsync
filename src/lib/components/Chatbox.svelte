@@ -96,6 +96,7 @@
     max-width: 375px;
     height: 100%;
     width: 90%;
+    margin-bottom: 1rem;
   }
   .top {
     flex-basis: 5%;
@@ -134,7 +135,9 @@
     margin: 1rem 0;
     scroll-behavior: smooth;
   }
-
+  .input {
+    display: flex;
+  }
   input {
     width: 100%;
     box-sizing: border-box;
