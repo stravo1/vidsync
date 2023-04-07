@@ -31,7 +31,7 @@
     ? "primary on-primary-text"
     : "primary-dark primary-text small"}
 >
-  <h1 on:click={handleSignOut} on:keydown={handleSignOut}>vidsync</h1>
+  <h1 class="unselectable" on:click={handleSignOut} on:keydown={handleSignOut}>vidsync</h1>
   <!-- <section>
     <a
       href="https://github.com/stravo1/vidsync"
