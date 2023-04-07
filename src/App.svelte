@@ -1,7 +1,6 @@
 <script>
   import Dashboard from "./lib/Dashboard.svelte";
   import Screen from "./lib/Screen.svelte";
-  import TopPanel from "./lib/TopPanel.svelte";
   import { initializeApp } from "firebase/app";
   import {
     getFirestore,
@@ -17,6 +16,7 @@
   } from "firebase/firestore";
   import { getAuth, onAuthStateChanged } from "firebase/auth";
   import {
+    deleteICEFromStore,
     firebaseConfig,
     registerChannelEventListeners,
     // to listen for "open", "close" and "message" events on a channel
@@ -192,6 +192,18 @@
     localName = "caller";
     remoteName = "callee";
 
+    const roomRef = doc(db, "rooms", roomId);
+    const roomSnapshot = await getDoc(roomRef);
+    // get the `roomId` document from the database
+
+    if (roomSnapshot.exists()) {
+      alert(
+        "Seems like the previous session didn't end properly. It is being taken care of, please be patient :)"
+      );
+      await deleteICEFromStore(db, roomId);
+      await deleteDoc(doc(db, "rooms", roomId));
+    }
+
     collectIceCandidates();
     registerPeerConnectionListeners(peerConnection, mic); // bitch 2
 
@@ -264,6 +276,14 @@
     if (roomSnapshot.exists()) {
       console.log("Room exists");
 
+      if (roomSnapshot.data().answer) {
+        alert("Room is already full :(");
+        joining.set(false);
+        // joining (and creating) state is used to keep track of the joining and creation of room statuses
+        promise = new Promise(() => {});
+        // reset the promise as we couldn't join (although the promise resolved which would have resulted in change in Dashboard)
+        return;
+      }
       localName = "callee";
       remoteName = "caller";
 
@@ -322,20 +342,7 @@
     } else {
       /* delete room from database */
       if (roomId) {
-        const calleeCandidates = await getDocs(
-          collection(db, "rooms", roomId, "callee")
-        );
-        calleeCandidates.docs.forEach(async (candidate) => {
-          // delete all the callee's ICE candidate list
-          await deleteDoc(candidate.ref);
-        });
-        const callerCandidates = await getDocs(
-          collection(db, "rooms", roomId, "caller")
-        );
-        callerCandidates.docs.forEach(async (candidate) => {
-          // delete all the caller's ICE candidate list
-          await deleteDoc(candidate.ref);
-        });
+        await deleteICEFromStore(db, roomId); // delete all ICE candidates
         if (unSubCall) {
           unSubCall();
         }

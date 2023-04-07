@@ -11,6 +11,7 @@ import {
   user,
 } from "./store";
 import { get } from "svelte/store";
+import { collection, deleteDoc, getDocs } from "firebase/firestore";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -218,10 +219,27 @@ const registerChannelEventListeners = (channel, hangUp) => {
     }
   });
 };
+const deleteICEFromStore = async (db, roomId) => {
+  const calleeCandidates = await getDocs(
+    collection(db, "rooms", roomId, "callee")
+  );
+  calleeCandidates.docs.forEach(async (candidate) => {
+    // delete all the callee's ICE candidate list
+    await deleteDoc(candidate.ref);
+  });
+  const callerCandidates = await getDocs(
+    collection(db, "rooms", roomId, "caller")
+  );
+  callerCandidates.docs.forEach(async (candidate) => {
+    // delete all the caller's ICE candidate list
+    await deleteDoc(candidate.ref);
+  });
+};
 export {
   getTime,
   firebaseConfig,
   commandInterpreter,
   registerPeerConnectionListeners,
   registerChannelEventListeners,
+  deleteICEFromStore,
 };
