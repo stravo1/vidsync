@@ -145,6 +145,9 @@
   .small {
     display: none;
   }
+  .hangup-small{
+    display: none;
+  }
   @media screen and (max-width: 720px) {
     .wrapper {
       max-width: unset;
