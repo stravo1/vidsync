@@ -2,7 +2,7 @@
   import { createEventDispatcher } from "svelte";
   import { creating, joining } from "../../assets/js/store";
 
-  import kitty from "../../assets/images/dog-jump.png";
+  import kitty from "../../assets/images/dog-jump.svg";
   import Spinner from "./Spinner.svelte";
   import TopPanel from "../TopPanel.svelte";
 

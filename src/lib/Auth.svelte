@@ -1,5 +1,5 @@
 <script>
-  import image from "../assets/images/unboxing.png";
+  import image from "../assets/images/unboxing.svg";
   import {
     browserLocalPersistence,
     GoogleAuthProvider,
@@ -103,6 +103,9 @@
     cursor: pointer;
     text-decoration: underline;
     text-decoration-thickness: 0.25rem;
+  }
+  .scroll {
+    display: none;
   }
   @media screen and (max-width: 720px) {
     .wrapper {
