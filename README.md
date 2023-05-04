@@ -16,12 +16,12 @@ this means both the peers need to have the video files locally available[^1]. it
 - support for subtitles (for you weebs and k-drama fans)
 - a chatbox to share live reactions
 - voice calls (if chatbox wasn't enough) 
-- astronaut illustrations while you wait for your friend to join
+- cute illustrations while you wait for your friend to join
 
 #### dependencies:
 - svelte: the main compiler
 - vite: the build tool
 - firebase: webRTC signalling server using firestore
 
-[^1]: you can download a large file when you have wifi and then watch it together on mobile data. no more exhausting daily data limits :) you can now watch an entire movie together using only a few megabytes of data (once you have the video file)
+[^1]: you can download a large file when you have wifi and then watch it together on mobile data on the go. no more exhausting daily data limits :) 
 [^2]: playing videos locally means there's no buffering, no streaming issues, no hiccups.
